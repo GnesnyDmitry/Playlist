@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/settings_root_view"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/settings_root_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/size_24dp"
+        app:navigationIcon="@drawable/ic_back">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textColor="@color/settings_root_text"
+            android:textSize="@dimen/size_22sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
+        android:text="@string/theme_night"
+        android:textAppearance="@style/MyStyle.Switch" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:background="@color/setting_background_btn"
+        android:drawableEnd="@drawable/ic_share"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
+        android:text="@string/share_app"
+        android:textAppearance="@style/MyStyle.Switch"
+        android:textColor="@color/settings_root_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:background="@color/setting_background_btn"
+        android:drawableEnd="@drawable/ic_support"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
+        android:text="@string/support_message"
+        android:textAppearance="@style/MyStyle.Switch"
+        android:textColor="@color/settings_root_text" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:background="@color/setting_background_btn"
+        android:drawableEnd="@drawable/ic_got_to"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
+        android:text="@string/therms_use"
+        android:textAppearance="@style/MyStyle.Switch"
+        android:textColor="@color/settings_root_text" />
+</LinearLayout>
