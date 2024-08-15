@@ -33,13 +33,13 @@
         android:backgroundTint="@color/white"
         android:text="@string/search"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/activity_root_text"
         android:textSize="@dimen/size_22sp"
         app:cornerRadius="@dimen/size_16dp"
         app:icon="@drawable/ic_search"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/size_10dp"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/activity_root_icon" />
 
     <Button
         android:id="@+id/activity_root_btn_media"
@@ -51,13 +51,13 @@
         android:backgroundTint="@color/white"
         android:text="@string/media"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/activity_root_text"
         android:textSize="@dimen/size_22sp"
         app:cornerRadius="@dimen/size_16dp"
         app:icon="@drawable/ic_media_lib"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/size_10dp"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/activity_root_icon" />
 
     <Button
         android:id="@+id/activity_root_btn_settings"
@@ -69,11 +69,11 @@
         android:backgroundTint="@color/white"
         android:text="@string/settings"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/activity_root_text"
         android:textSize="@dimen/size_22sp"
         app:cornerRadius="@dimen/size_16dp"
         app:icon="@drawable/ic_settings"
         app:iconGravity="textStart"
         app:iconPadding="@dimen/size_10dp"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/activity_root_icon" />
 </LinearLayout>

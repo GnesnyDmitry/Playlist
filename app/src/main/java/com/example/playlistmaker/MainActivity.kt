@@ -28,16 +28,19 @@ class MainActivity : AppCompatActivity() {
 
         btnSearch.setOnClickListener {
             val goSearchActivity = Intent(this, SearchActivity::class.java)
+            goSearchActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(goSearchActivity)
         }
 
         btnMedia.setOnClickListener {
             val goMediaActivity = Intent(this, MediaActivity::class.java)
+            goMediaActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(goMediaActivity)
         }
 
         btnSettings.setOnClickListener {
             val goSettingsActivity = Intent(this, SettingsActivity::class.java)
+            goSettingsActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(goSettingsActivity)
         }
     }
