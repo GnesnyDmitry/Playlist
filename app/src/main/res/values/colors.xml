@@ -3,16 +3,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#3772E7</color>
-    <color name="grey">#AEAFB4</color>
-
-    <color name="activity_root">#3772E7</color>
+    <color name="gray">#AEAFB4</color>
 
     <color name="settings_root_ic_back">#FF000000</color>
     <color name="settings_root_view">#FFFFFFFF</color>
     <color name="settings_root_text">#000000</color>
     <color name="setting_background_btn">#FFFFFFFF</color>
-    <color name="activity_root_text">#1A1B22</color>
     <color name="settings_root_icon">#AEAFB4</color>
-    <color name="activity_root_icon">#1A1B22</color>
 
+    <color name="activity_root_text">#1A1B22</color>
+    <color name="activity_root_icon">#1A1B22</color>
+    <color name="activity_root">#3772E7</color>
+
+    <color name="search_root">#FFFFFFFF</color>
+    <color name="search_root_text">#1A1B22</color>
+    <color name="edittext_bar_search_root">#E6E8EB</color>
+    <color name="edittext_text_search_root">#AEAFB4</color>
+    <color name="ic_search_14">#AEAFB4</color>
 </resources>
