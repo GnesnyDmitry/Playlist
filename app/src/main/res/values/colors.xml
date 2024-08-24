@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#3772E7</color>
+    <color name="grey">#AEAFB4</color>
+
+    <color name="activity_root">#3772E7</color>
+
+    <color name="settings_root_ic_back">#FF000000</color>
+    <color name="settings_root_view">#FFFFFFFF</color>
+    <color name="settings_root_text">#000000</color>
+    <color name="setting_background_btn">#FFFFFFFF</color>
+    <color name="activity_root_text">#1A1B22</color>
+    <color name="settings_root_icon">#AEAFB4</color>
+    <color name="activity_root_icon">#1A1B22</color>
+
 </resources>

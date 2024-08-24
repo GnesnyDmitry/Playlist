@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="activity_root">#FF000000</color>
+
+    <color name="settings_root_ic_back">#FFFFFFFF</color>
+    <color name="settings_root_view">#1A1B22</color>
+    <color name="settings_root_text">#FFFFFF</color>
+    <color name="setting_background_btn">#1A1B22</color>
+    <color name="settings_root_icon">#FFFFFFFF</color>
+
+</resources>
