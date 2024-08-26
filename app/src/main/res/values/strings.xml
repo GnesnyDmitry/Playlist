@@ -9,4 +9,10 @@
     <string name="therms_use">Пользовательское соглашение</string>
     <string name="in_search">Вы попали в поиск</string>
     <string name="in_media">Вы попали в медиатеку</string>
+    <string name="share_app_text">Привет! Ознакомься с курсом по Андроид-разработке в Практикуме: https://practicum.yandex.ru/android-developer/</string>
+    <string name="support_email">gnesnydmitry@gmail.com</string>
+    <string name="support_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="support_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="no_email_client">Нет почтового клиента на устройстве</string>
+    <string name="url">https://yandex.ru/legal/practicum_offer/</string>
 </resources>

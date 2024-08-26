@@ -13,6 +13,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 
 class SearchActivity : AppCompatActivity() {
@@ -21,6 +22,8 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
     }
 
+    private lateinit var search: EditText
+    private lateinit var clearing: ImageView
     private var searchText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,8 +36,8 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        val search = findViewById<EditText>(R.id.edittext_search_root)
-        val clearing = findViewById<ImageView>(R.id.icon_clear_text)
+        search = findViewById(R.id.edittext_search_root)
+        clearing = findViewById(R.id.icon_clear_text)
 
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
@@ -61,7 +64,7 @@ class SearchActivity : AppCompatActivity() {
             search.text.clear()
             val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             hideKeyboard?.hideSoftInputFromWindow(clearing.windowToken, 0)
-            clearing.visibility = View.GONE
+            clearing.isVisible = false
         }
     }
     override fun onSaveInstanceState(outState: Bundle) {
@@ -72,6 +75,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
-        findViewById<EditText>(R.id.edittext_search_root).setText(searchText)
+        search.setText(searchText)
     }
 }

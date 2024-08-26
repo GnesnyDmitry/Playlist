@@ -47,30 +47,31 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun shareApp() {
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Привет! Ознакомься с курсом по Андроид-разработке в Практикуме: https://practicum.yandex.ru/android-developer/")
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.share_app_text))
+            startActivity(Intent.createChooser(this, getString(R.string.share_app_text)))
         }
-        startActivity(Intent.createChooser(shareIntent, "Поделиться через"))
     }
 
     private fun contactSupport() {
-        val contactSupportIntent = Intent(Intent.ACTION_SENDTO).apply {
+        Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("gnesnydmitry@gmail.com"))
-            putExtra(Intent.EXTRA_SUBJECT, "Сообщение разработчикам и разработчицам приложения Playlist Maker")
-            putExtra(Intent.EXTRA_TEXT, "Спасибо разработчикам и разработчицам за крутое приложение!")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_subject))
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.support_body))
+            startActivity(this)
         }
-        startActivity(contactSupportIntent)
     }
 
     private fun thermsUse() {
-        val url = "https://yandex.ru/legal/practicum_offer/"
-        val thermsUseIntent = Intent(Intent.ACTION_VIEW).apply {
+        val url = getString(R.string.url)
+        Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(url)
+            startActivity(this)
         }
-        startActivity(thermsUseIntent)
     }
-
 }
