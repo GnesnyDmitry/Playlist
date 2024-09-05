@@ -34,4 +34,14 @@
         <item name="android:textFontWeight">500</item>
         <item name="android:background">@drawable/ripple_for_btn</item>
     </style>
+
+    <style name="text_for_recycler">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/size_11sp</item>
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:maxLength">25</item>
+    </style>
 </resources>
