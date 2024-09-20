@@ -28,11 +28,6 @@ import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
 
-    companion object {
-        private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
-        private const val NOT_BE_NULL = "response should not be null"
-    }
-
     private val iTunesBaseUrl = "https://itunes.apple.com"
     private lateinit var search: EditText
     private lateinit var clearing: ImageView
@@ -73,8 +68,8 @@ class SearchActivity : AppCompatActivity() {
 
         adapter.trackList = trackList
 
-        placeholderNoConnection.visibility = View.GONE
-        placeholderNothingFound.visibility = View.GONE
+        placeholderNoConnection.isVisible = false
+        placeholderNothingFound.isVisible = false
 
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
@@ -89,6 +84,12 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearing.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 searchText = s.toString()
+
+                if(s.isNullOrEmpty()) {
+                    trackList.clear()
+                    adapter.notifyDataSetChanged()
+                    hideAllPlaceholders()
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -130,11 +131,10 @@ class SearchActivity : AppCompatActivity() {
                     response: Response<TrackResponse>
                 ) {
                     if (response.isSuccessful) {
+                        val body = response.body()
                         trackList.clear()
-                        if (response.body()?.results?.isNotEmpty() == true) {
-                            val newTrackList =
-                                requireNotNull(response.body()?.results) { "$NOT_BE_NULL}" }
-                            trackList.addAll(newTrackList)
+                        if (body != null && body.results.isNotEmpty()) {
+                            trackList.addAll(body.results)
                             adapter.notifyDataSetChanged()
                             hideAllPlaceholders()
                         }
@@ -153,18 +153,18 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideAllPlaceholders() {
-        placeholderNoConnection.visibility = View.GONE
-        placeholderNothingFound.visibility = View.GONE
+        placeholderNoConnection.isVisible = false
+        placeholderNothingFound.isVisible = false
     }
 
     private fun showPlaceholderNoConnection() {
         hideAllPlaceholders()
-        placeholderNoConnection.visibility = View.VISIBLE
+        placeholderNoConnection.isVisible = true
     }
 
     private fun showPlaceholderNothingFound() {
         hideAllPlaceholders()
-        placeholderNothingFound.visibility = View.VISIBLE
+        placeholderNothingFound.isVisible = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -176,5 +176,10 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
         search.setText(searchText)
+    }
+
+    companion object {
+        private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
+        private const val NOT_BE_NULL = "response should not be null"
     }
 }

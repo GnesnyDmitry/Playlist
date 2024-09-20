@@ -1,5 +1,7 @@
 package com.example.playlistmaker
 
+import android.content.Context
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -29,7 +31,7 @@ class TrackViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
             .with(itemView.context)
             .load(track.artworkUrl100)
             .placeholder(R.drawable.placeholder)
-            .transform(RoundedCorners(4))
+            .transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.track_rounded_corners)))
             .into(pictureTrack)
     }
 
