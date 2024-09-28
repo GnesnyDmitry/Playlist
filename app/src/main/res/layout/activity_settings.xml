@@ -63,6 +63,6 @@
         android:paddingEnd="@dimen/size_16dp"
         android:id="@+id/btn_therms_use"
         style="@style/ButtonForSettings"
-        android:drawableEnd="@drawable/ic_got_to"
+        android:drawableEnd="@drawable/ic_go_to"
         android:text="@string/therms_use" />
 </LinearLayout>
