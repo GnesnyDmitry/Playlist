@@ -24,7 +24,8 @@
             android:textFontWeight="500"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/theme_switcher"
         android:layout_width="match_parent"
         android:layout_height="@dimen/size_60dp"
         android:gravity="start|center_vertical"

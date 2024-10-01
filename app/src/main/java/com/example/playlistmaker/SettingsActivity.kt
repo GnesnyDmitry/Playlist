@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+
+const val SHARED_PREFERENCE_THEME = "shared_preference_theme"
 
 class SettingsActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -25,10 +28,14 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        val sharedPrefsTheme = getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
+        val editor = sharedPrefsTheme.edit()
+
         val toolbarSettings = findViewById<Toolbar>(R.id.settings_root_toolbar)
         val btnShareApp = findViewById<Button>(R.id.btn_share_app)
         val btnContactSupport = findViewById<Button>(R.id.btn_contact_support)
         val btnThermsUse = findViewById<Button>(R.id.btn_therms_use)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switcher)
 
         toolbarSettings.setNavigationOnClickListener {
             finish()
@@ -44,6 +51,15 @@ class SettingsActivity : AppCompatActivity() {
 
         btnThermsUse.setOnClickListener {
             thermsUse()
+        }
+
+        val switchState = sharedPrefsTheme.getBoolean("THEME_STATE", false)
+        themeSwitcher.isChecked = switchState
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+            editor.putBoolean("THEME_STATE", checked)
+            editor.apply()
         }
     }
 

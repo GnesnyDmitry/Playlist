@@ -4,27 +4,30 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.adapter.TrackAdapter
+import com.example.playlistmaker.model.Track
+import com.example.playlistmaker.okhttp.ITunesSearchApi
+import com.example.playlistmaker.okhttp.TrackResponse
+import com.example.playlistmaker.preferenceStorage.TrackStorage
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
 
@@ -36,10 +39,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var btnUpdate: Button
     private lateinit var recycler: RecyclerView
     private var searchText: String? = null
+    private lateinit var btnClearHistory: Button
+    private lateinit var header: TextView
 
     private val trackList = ArrayList<Track>()
 
-    private val adapter = TrackAdapter()
+    private val adapter = TrackAdapter(this::setOnClickTrack)
 
     private val retrofit =
         Retrofit.Builder().baseUrl(iTunesBaseUrl).addConverterFactory(GsonConverterFactory.create())
@@ -62,11 +67,15 @@ class SearchActivity : AppCompatActivity() {
         placeholderNoConnection = findViewById(R.id.placeholder_no_connection)
         placeholderNothingFound = findViewById(R.id.placeholder_nothing_found)
         btnUpdate = findViewById(R.id.btn_update)
+        btnClearHistory = findViewById(R.id.btn_clear_history)
+        header = findViewById(R.id.header_search_root)
 
         recycler = findViewById(R.id.recyclerView)
         recycler.adapter = adapter
 
         adapter.trackList = trackList
+
+        showHistorySearch()
 
         placeholderNoConnection.isVisible = false
         placeholderNothingFound.isVisible = false
@@ -90,12 +99,30 @@ class SearchActivity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                     hideAllPlaceholders()
                 }
+
+                    if (search.hasFocus() && s?.isEmpty() == true) showHistorySearch()
             }
 
             override fun afterTextChanged(s: Editable?) {
                 // Заглушка для будущих задач
             }
         })
+
+        search.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && search.text.isEmpty()) {
+                showHistorySearch() // показываем историю
+            } else {
+                hideHeaderAndFooter() // прячем историю при потере фокуса
+            }
+        }
+
+
+
+        btnClearHistory.setOnClickListener {
+            App.instance.trackStorage.clearTracks()
+            adapter.trackList.clear()
+            adapter.notifyDataSetChanged()
+        }
 
         // Логика для кнопки очистки текста
         clearing.setOnClickListener {
@@ -107,6 +134,7 @@ class SearchActivity : AppCompatActivity() {
 
         btnUpdate.setOnClickListener {
             if (search.text.isNotEmpty()) {
+                hideHeaderAndFooter()
                 sendSearchRequest()
             }
         }
@@ -114,6 +142,7 @@ class SearchActivity : AppCompatActivity() {
         search.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (search.text.isNotEmpty()) {
+                    hideHeaderAndFooter()
                     sendSearchRequest()
                 }
                 true
@@ -152,6 +181,19 @@ class SearchActivity : AppCompatActivity() {
             })
     }
 
+    private fun showHistorySearch() {
+            header.isVisible = true
+            btnClearHistory.isVisible = true
+            adapter.trackList.clear()
+            adapter.trackList.addAll(App.instance.trackStorage.getTrackList())
+            adapter.notifyDataSetChanged()
+    }
+
+    private fun hideHeaderAndFooter() {
+        btnClearHistory.isVisible = false
+        header.isVisible = false
+    }
+
     private fun hideAllPlaceholders() {
         placeholderNoConnection.isVisible = false
         placeholderNothingFound.isVisible = false
@@ -176,6 +218,10 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
         search.setText(searchText)
+    }
+
+    fun setOnClickTrack(track: Track) {
+        App.instance.trackStorage.addTrack(track)
     }
 
     companion object {

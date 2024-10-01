@@ -1,14 +1,20 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.TrackViewHolder
+import com.example.playlistmaker.model.Track
 
-class TrackAdapter() : RecyclerView.Adapter<TrackViewHolder>() {
+class TrackAdapter(
+    private val action: (Track) -> Unit
+) : RecyclerView.Adapter<TrackViewHolder>() {
+
 
     var trackList = ArrayList<Track>()
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder =
-        TrackViewHolder(parent)
+        TrackViewHolder(parent, action)
 
 
     override fun getItemCount(): Int = trackList.size

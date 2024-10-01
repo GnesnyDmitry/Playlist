@@ -21,8 +21,10 @@
     <color name="edittext_bar_search_root">#E6E8EB</color>
     <color name="edittext_text_search_root">#AEAFB4</color>
     <color name="ic_search_14">#AEAFB4</color>
-    <color name="color_song_name">#000000</color>
-    <color name="color_artist_name">#AEAFB4</color>
-    <color name="color_time_track">#AEAFB4</color>
-    <color name="color_picture_track">#1A1B22</color>
+    <color name="song_name">#000000</color>
+    <color name="artist_name">#AEAFB4</color>
+    <color name="time_track">#AEAFB4</color>
+    <color name="picture_track">#1A1B22</color>
+    <color name="search_root_btn">#1A1B22</color>
+    <color name="search_root_btn_text">#FFFFFF</color>
 </resources>
