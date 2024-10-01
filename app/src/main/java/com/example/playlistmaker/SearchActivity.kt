@@ -4,11 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,18 +19,33 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
 
-    companion object {
-        private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
-    }
-
+    private val iTunesBaseUrl = "https://itunes.apple.com"
     private lateinit var search: EditText
     private lateinit var clearing: ImageView
-    private var searchText: String? = null
+    private lateinit var placeholderNoConnection: View
+    private lateinit var placeholderNothingFound: View
+    private lateinit var btnUpdate: Button
     private lateinit var recycler: RecyclerView
-    private val trackList = mutableListOf<Track>()
+    private var searchText: String? = null
+
+    private val trackList = ArrayList<Track>()
+
+    private val adapter = TrackAdapter()
+
+    private val retrofit =
+        Retrofit.Builder().baseUrl(iTunesBaseUrl).addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+    private val iTunesService = retrofit.create(ITunesSearchApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +59,17 @@ class SearchActivity : AppCompatActivity() {
 
         search = findViewById(R.id.edittext_search_root)
         clearing = findViewById(R.id.icon_clear_text)
+        placeholderNoConnection = findViewById(R.id.placeholder_no_connection)
+        placeholderNothingFound = findViewById(R.id.placeholder_nothing_found)
+        btnUpdate = findViewById(R.id.btn_update)
+
+        recycler = findViewById(R.id.recyclerView)
+        recycler.adapter = adapter
+
+        adapter.trackList = trackList
+
+        placeholderNoConnection.isVisible = false
+        placeholderNothingFound.isVisible = false
 
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
@@ -55,6 +84,12 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearing.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 searchText = s.toString()
+
+                if(s.isNullOrEmpty()) {
+                    trackList.clear()
+                    adapter.notifyDataSetChanged()
+                    hideAllPlaceholders()
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -70,48 +105,66 @@ class SearchActivity : AppCompatActivity() {
             clearing.isVisible = false
         }
 
-        trackList.add(
-            Track(
-                "Smells Like Teen Spirit",
-                "Nirvana",
-                "5:01",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            )
-        )
-        trackList.add(
-            Track(
-                "Billie Jean",
-                "Michael Jackson",
-                "4:35",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            )
-        )
-        trackList.add(
-            Track(
-                "Staying' Alive",
-                "Bee Gees",
-                "4:10",
-                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            )
-        )
-        trackList.add(
-            Track(
-                "Whole Lotta Love",
-                "Led Zeppelin",
-                "5:33",
-                "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            )
-        )
-        trackList.add(
-            Track(
-                "Sweet Child O'Mine",
-                "Guns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
-        (0..20).map { trackList.add(trackList[(0..4).random()]) }
-        setRecycler(trackList)
+        btnUpdate.setOnClickListener {
+            if (search.text.isNotEmpty()) {
+                sendSearchRequest()
+            }
+        }
+
+        search.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (search.text.isNotEmpty()) {
+                    sendSearchRequest()
+                }
+                true
+            }
+            false
+        }
+    }
+
+    private fun sendSearchRequest() {
+        iTunesService.search(search.text.toString())
+            .enqueue(object : Callback<TrackResponse> {
+
+                override fun onResponse(
+                    call: Call<TrackResponse>,
+                    response: Response<TrackResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        trackList.clear()
+                        if (body != null && body.results.isNotEmpty()) {
+                            trackList.addAll(body.results)
+                            adapter.notifyDataSetChanged()
+                            hideAllPlaceholders()
+                        }
+                        if (trackList.isEmpty()) {
+                            showPlaceholderNothingFound() // если треков не найдено
+                        }
+                    } else {
+                        showPlaceholderNoConnection() // если возникла ошибка
+                    }
+                }
+
+                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    showPlaceholderNoConnection() // если произошла ошибка
+                }
+            })
+    }
+
+    private fun hideAllPlaceholders() {
+        placeholderNoConnection.isVisible = false
+        placeholderNothingFound.isVisible = false
+    }
+
+    private fun showPlaceholderNoConnection() {
+        hideAllPlaceholders()
+        placeholderNoConnection.isVisible = true
+    }
+
+    private fun showPlaceholderNothingFound() {
+        hideAllPlaceholders()
+        placeholderNothingFound.isVisible = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -125,8 +178,8 @@ class SearchActivity : AppCompatActivity() {
         search.setText(searchText)
     }
 
-    private fun setRecycler(trackList: List<Track>) {
-        recycler = findViewById(R.id.recyclerView)
-        recycler.adapter = TrackAdapter(trackList)
+    companion object {
+        private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
+        private const val NOT_BE_NULL = "response should not be null"
     }
 }

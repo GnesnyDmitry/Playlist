@@ -15,4 +15,7 @@
     <string name="support_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="no_email_client">Нет почтового клиента на устройстве</string>
     <string name="url">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="text_for_placeholder_no_connection">Проблемы со связью \n\n Загрузка не удалась. Проверьте \n подключение к интернету</string>
+    <string name="text_for_placeholder_nothing_found">Ничего не нашлось</string>
+    <string name="text_for_btn_update">Обновить</string>
 </resources>

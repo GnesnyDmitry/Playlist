@@ -39,6 +39,10 @@ dependencies {
 
     //Glide
     implementation(libs.glide)
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converterGson)
+    implementation(libs.gson)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
