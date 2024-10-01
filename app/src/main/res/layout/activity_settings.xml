@@ -34,20 +34,35 @@
         android:textAppearance="@style/MyStyle.Switch" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
         android:id="@+id/btn_share_app"
         style="@style/ButtonForSettings"
         android:drawableEnd="@drawable/ic_share"
         android:text="@string/share_app" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
         android:id="@+id/btn_contact_support"
         style="@style/ButtonForSettings"
         android:drawableEnd="@drawable/ic_support"
         android:text="@string/support_message" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_60dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/size_16dp"
+        android:paddingEnd="@dimen/size_16dp"
         android:id="@+id/btn_therms_use"
         style="@style/ButtonForSettings"
-        android:drawableEnd="@drawable/ic_got_to"
+        android:drawableEnd="@drawable/ic_go_to"
         android:text="@string/therms_use" />
 </LinearLayout>

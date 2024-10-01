@@ -37,6 +37,13 @@ android {
 
 dependencies {
 
+    //Glide
+    implementation(libs.glide)
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converterGson)
+    implementation(libs.gson)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -45,4 +52,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }
