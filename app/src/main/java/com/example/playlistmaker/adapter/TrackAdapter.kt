@@ -10,7 +10,7 @@ class TrackAdapter(
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
 
-    var trackList = ArrayList<Track>()
+    val trackList = ArrayList<Track>()
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder =

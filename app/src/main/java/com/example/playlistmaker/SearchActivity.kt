@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
@@ -14,9 +15,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.adapter.TrackAdapter
 import com.example.playlistmaker.model.Track
@@ -41,8 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private var searchText: String? = null
     private lateinit var btnClearHistory: Button
     private lateinit var header: TextView
-
-    private val trackList = ArrayList<Track>()
+    private lateinit var toolbar: Toolbar
 
     private val adapter = TrackAdapter(this::setOnClickTrack)
 
@@ -69,16 +71,15 @@ class SearchActivity : AppCompatActivity() {
         btnUpdate = findViewById(R.id.btn_update)
         btnClearHistory = findViewById(R.id.btn_clear_history)
         header = findViewById(R.id.header_search_root)
+        toolbar = findViewById(R.id.search_root_toolbar)
 
         recycler = findViewById(R.id.recyclerView)
         recycler.adapter = adapter
 
-        adapter.trackList = trackList
-
-        showHistorySearch()
-
         placeholderNoConnection.isVisible = false
         placeholderNothingFound.isVisible = false
+
+        toolbar.setNavigationOnClickListener { finish() }
 
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
@@ -93,14 +94,13 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearing.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
                 searchText = s.toString()
-
-                if(s.isNullOrEmpty()) {
-                    trackList.clear()
-                    adapter.notifyDataSetChanged()
+                if (s.isNullOrEmpty()) {
+                    showHistorySearch()
                     hideAllPlaceholders()
+                } else {
+                    hideHeaderAndFooter()
+                    adapter.trackList.clear()
                 }
-
-                    if (search.hasFocus() && s?.isEmpty() == true) showHistorySearch()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -108,20 +108,20 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
-        search.setOnFocusChangeListener { view, hasFocus ->
+        search.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus && search.text.isEmpty()) {
-                showHistorySearch() // показываем историю
-            } else {
-                hideHeaderAndFooter() // прячем историю при потере фокуса
+                showHistorySearch()
             }
         }
 
-
-
         btnClearHistory.setOnClickListener {
+            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            hideKeyboard?.hideSoftInputFromWindow(clearing.windowToken, 0)
+            hideHeaderAndFooter()
             App.instance.trackStorage.clearTracks()
             adapter.trackList.clear()
             adapter.notifyDataSetChanged()
+
         }
 
         // Логика для кнопки очистки текста
@@ -130,6 +130,7 @@ class SearchActivity : AppCompatActivity() {
             val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             hideKeyboard?.hideSoftInputFromWindow(clearing.windowToken, 0)
             clearing.isVisible = false
+            showHistorySearch()
         }
 
         btnUpdate.setOnClickListener {
@@ -161,13 +162,13 @@ class SearchActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful) {
                         val body = response.body()
-                        trackList.clear()
+                        adapter.trackList.clear()
                         if (body != null && body.results.isNotEmpty()) {
-                            trackList.addAll(body.results)
+                            adapter.trackList.addAll(body.results)
                             adapter.notifyDataSetChanged()
                             hideAllPlaceholders()
                         }
-                        if (trackList.isEmpty()) {
+                        if (adapter.trackList.isEmpty()) {
                             showPlaceholderNothingFound() // если треков не найдено
                         }
                     } else {
@@ -182,11 +183,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistorySearch() {
+        val trackList = App.instance.trackStorage.getTrackList()
+        if (trackList.isNotEmpty()) {
             header.isVisible = true
             btnClearHistory.isVisible = true
             adapter.trackList.clear()
-            adapter.trackList.addAll(App.instance.trackStorage.getTrackList())
+            adapter.trackList.addAll(trackList)
             adapter.notifyDataSetChanged()
+        }
     }
 
     private fun hideHeaderAndFooter() {

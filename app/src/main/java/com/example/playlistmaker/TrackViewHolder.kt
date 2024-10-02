@@ -23,6 +23,7 @@ class TrackViewHolder(parent: ViewGroup,
     private val trackTime: TextView = itemView.findViewById(R.id.time_track)
 
     fun bind(track: Track) {
+        println("qqq bind")
         trackName.text = track.trackName
         artistName.text = track.artistName
         trackTime.text = formatTrackTime(track.trackTimeMillis)
