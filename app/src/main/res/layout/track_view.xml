@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_track"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="?attr/colorSecondary"
@@ -17,7 +18,7 @@
         android:layout_marginStart="@dimen/size_16dp"
         android:layout_marginTop="@dimen/size_8sp"
         android:layout_marginBottom="@dimen/size_8sp"
-        android:backgroundTint="@color/color_picture_track"
+        android:backgroundTint="@color/picture_track"
         android:scaleType="centerCrop" />
 
     <LinearLayout
@@ -32,7 +33,7 @@
             android:id="@+id/song_name"
             style="@style/text_for_recycler"
             android:maxLength="35"
-            android:textColor="@color/color_song_name"
+            android:textColor="@color/song_name"
             android:textSize="@dimen/size_16sp"
             tools:text="Smells Like Teen Spirit" />
 
@@ -44,7 +45,7 @@
             <TextView
                 android:id="@+id/artist_name"
                 style="@style/text_for_recycler"
-                android:textColor="@color/color_artist_name"
+                android:textColor="@color/artist_name"
                 tools:text="Nirvana" />
 
             <ImageView
@@ -58,7 +59,7 @@
             <TextView
                 android:id="@+id/time_track"
                 style="@style/text_for_recycler"
-                android:textColor="@color/color_time_track"
+                android:textColor="@color/time_track"
                 tools:text="2:55" />
         </LinearLayout>
     </LinearLayout>

@@ -7,6 +7,13 @@
         <item name="fontFamily">@font/ys_display_regular</item>
     </style>
 
+    <style name="MySwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="trackColorActive">@color/blue_light</item>
+        <item name="colorSwitchThumbNormal">@color/gray_light</item>
+        <item name="trackColorInactive">@color/gray</item>
+    </style>
+
     <style name="ButtonForSettings" parent="TextAppearance.AppCompat.Widget.Button">
         <item name="fontFamily">@font/ys_display_regular</item>
         <item name="textAllCaps">false</item>
@@ -53,4 +60,5 @@
         <item name="android:maxLines">1</item>
         <item name="android:maxLength">25</item>
     </style>
+
 </resources>

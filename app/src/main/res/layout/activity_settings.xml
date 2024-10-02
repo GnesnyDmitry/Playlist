@@ -24,14 +24,17 @@
             android:textFontWeight="500"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/theme_switcher"
         android:layout_width="match_parent"
         android:layout_height="@dimen/size_60dp"
         android:gravity="start|center_vertical"
         android:paddingStart="@dimen/size_16dp"
         android:paddingEnd="@dimen/size_16dp"
         android:text="@string/theme_night"
-        android:textAppearance="@style/MyStyle.Switch" />
+        android:textColor="@color/settings_root_text"
+        android:theme="@style/MySwitch"
+        android:textAppearance="@style/MyStyle.Switch"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
