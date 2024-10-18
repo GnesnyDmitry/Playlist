@@ -61,4 +61,26 @@
         <item name="android:maxLength">25</item>
     </style>
 
+    <style name="text_for_player_left">
+        <item name="android:maxLines">1</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:ellipsize">end</item>
+        <item name="layout_constraintHorizontal_bias">0.0</item>
+        <item name="android:layout_marginTop">@dimen/size_8dp</item>
+        <item name="android:textColor">@color/text_for_player_left</item>
+        <item name="android:textSize">@dimen/size_13sp</item>
+    </style>
+
+    <style name="text_for_player_right">
+        <item name="android:maxLines">1</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:ellipsize">end</item>
+        <item name="layout_constraintHorizontal_bias">1</item>
+        <item name="android:layout_marginStart">@dimen/size_50dp</item>
+        <item name="layout_constrainedWidth">true</item>
+        <item name="android:layout_marginTop">@dimen/size_8dp</item>
+        <item name="android:textColor">@color/text_for_player_right</item>
+        <item name="android:textSize">@dimen/size_13sp</item>
+    </style>
+
 </resources>

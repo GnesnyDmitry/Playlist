@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -155,7 +156,6 @@ class SearchActivity : AppCompatActivity() {
     private fun sendSearchRequest() {
         iTunesService.search(search.text.toString())
             .enqueue(object : Callback<TrackResponse> {
-
                 override fun onResponse(
                     call: Call<TrackResponse>,
                     response: Response<TrackResponse>
@@ -224,12 +224,16 @@ class SearchActivity : AppCompatActivity() {
         search.setText(searchText)
     }
 
-    fun setOnClickTrack(track: Track) {
+    private fun setOnClickTrack(track: Track) {
         App.instance.trackStorage.addTrack(track)
+        val intent = Intent(this, PlayerActivity::class.java).apply {
+            putExtra(TRACK_KEY, track)
+        }
+        startActivity(intent)
     }
 
     companion object {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
-        private const val NOT_BE_NULL = "response should not be null"
+        private const val TRACK_KEY = "track"
     }
 }
