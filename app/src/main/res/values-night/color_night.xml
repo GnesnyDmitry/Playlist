@@ -20,4 +20,9 @@
     <color name="picture_track">#FFFFFF</color>
     <color name="search_root_btn">#FFFFFF</color>
     <color name="search_root_btn_text">#1A1B22</color>
+
+    <color name="text_for_player_left">#AEAFB4</color>
+    <color name="text_for_player_right">#FFFFFF</color>
+    <color name="audio_player_root">#1A1B22</color>
+    <color name="btn_play">#FFFFFF</color>
 </resources>

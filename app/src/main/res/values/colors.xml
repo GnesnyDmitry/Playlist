@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
+    <color name="black_yp">#1A1B22</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#3772E7</color>
     <color name="blue_light">#9FBBF3</color>
@@ -31,4 +32,9 @@
     <color name="picture_track">#1A1B22</color>
     <color name="search_root_btn">#1A1B22</color>
     <color name="search_root_btn_text">#FFFFFF</color>
+
+    <color name="text_for_player_left">#AEAFB4</color>
+    <color name="text_for_player_right">#1A1B22</color>
+    <color name="audio_player_root">#FFFFFF</color>
+    <color name="btn_play">#1A1B22</color>
 </resources>
