@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.model.Track
+import com.example.playlistmaker.tools.Debouncer
+import com.example.playlistmaker.tools.debounceClickListener
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -16,6 +18,8 @@ class TrackViewHolder(parent: ViewGroup,
 ) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.track_view, parent, false)
 ) {
+
+    private val debouncer = Debouncer()
 
     private val pictureTrack: ImageView = itemView.findViewById(R.id.picture_track)
     private val trackName: TextView = itemView.findViewById(R.id.song_name)
@@ -34,9 +38,7 @@ class TrackViewHolder(parent: ViewGroup,
             .transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.size_2dp)))
             .into(pictureTrack)
 
-        itemView.setOnClickListener {
-            action(track)
-        }
+        itemView.debounceClickListener(debouncer, { action.invoke(track) })
     }
 
     private fun formatTrackTime(trackTimeMillis: Int): String {
