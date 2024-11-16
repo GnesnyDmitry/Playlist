@@ -69,6 +69,7 @@ class PlayButtonManager(
         }
         mediaPlayer.setOnCompletionListener {
             view.changeImageForPlayButton(R.drawable.player_play)
+            view.updateTrackTimer(0)
             stateMedialPlayer = StateMedialPlayer.STATE_PREPARED
         }
     }
