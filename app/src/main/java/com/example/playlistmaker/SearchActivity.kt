@@ -3,6 +3,8 @@ package com.example.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -13,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -46,6 +49,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var btnClearHistory: Button
     private lateinit var header: TextView
     private lateinit var toolbar: Toolbar
+    private lateinit var progressBar: ProgressBar
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { sendSearchRequest() }
 
     private val adapter = TrackAdapter(this::setOnClickTrack)
 
@@ -73,6 +80,8 @@ class SearchActivity : AppCompatActivity() {
         btnClearHistory = findViewById(R.id.btn_clear_history)
         header = findViewById(R.id.header_search_root)
         toolbar = findViewById(R.id.search_root_toolbar)
+        progressBar = findViewById(R.id.progressBar)
+
 
         recycler = findViewById(R.id.recyclerView)
         recycler.adapter = adapter
@@ -102,6 +111,7 @@ class SearchActivity : AppCompatActivity() {
                     hideHeaderAndFooter()
                     adapter.trackList.clear()
                 }
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -154,32 +164,46 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun sendSearchRequest() {
-        iTunesService.search(search.text.toString())
-            .enqueue(object : Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        adapter.trackList.clear()
-                        if (body != null && body.results.isNotEmpty()) {
-                            adapter.trackList.addAll(body.results)
-                            adapter.notifyDataSetChanged()
-                            hideAllPlaceholders()
-                        }
-                        if (adapter.trackList.isEmpty()) {
-                            showPlaceholderNothingFound() // если треков не найдено
-                        }
-                    } else {
-                        showPlaceholderNoConnection() // если возникла ошибка
-                    }
-                }
+        if (search.text.isNotEmpty()) {
 
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    showPlaceholderNoConnection() // если произошла ошибка
-                }
-            })
+            progressBar.isVisible = true
+            recycler.isVisible = false
+
+            iTunesService.search(search.text.toString())
+                .enqueue(object : Callback<TrackResponse> {
+                    override fun onResponse(
+                        call: Call<TrackResponse>,
+                        response: Response<TrackResponse>
+                    ) {
+                        progressBar.isVisible = false
+                        recycler.isVisible = true
+                        if (response.isSuccessful) {
+                            val bodyWithPreview = response.body()?.results?.filter { it.previewUrl != null }
+                            adapter.trackList.clear()
+                            if (!bodyWithPreview.isNullOrEmpty()) {
+                                adapter.trackList.addAll(bodyWithPreview)
+                                adapter.notifyDataSetChanged()
+                                hideAllPlaceholders()
+                            }
+                            if (adapter.trackList.isEmpty()) {
+                                showPlaceholderNothingFound() // если треков не найдено
+                            }
+                        } else {
+                            showPlaceholderNoConnection() // если возникла ошибка
+                        }
+                    }
+
+                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        progressBar.isVisible = false
+                        showPlaceholderNoConnection() // если произошла ошибка
+                    }
+                })
+        }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, POST_DELAY_SEARCH_DEBOUNCE)
     }
 
     private fun showHistorySearch() {
@@ -234,6 +258,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
-        private const val TRACK_KEY = "track"
+        const val TRACK_KEY = "track"
+        private const val POST_DELAY_SEARCH_DEBOUNCE = 2000L
     }
 }

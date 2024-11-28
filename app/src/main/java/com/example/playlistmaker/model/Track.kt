@@ -1,6 +1,7 @@
 package com.example.playlistmaker.model
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
@@ -15,4 +16,5 @@ data class Track(
     val releaseDate: String,
     val primaryGenreName: String,
     val country: String,
+    val previewUrl: String?,
 ) : Parcelable
