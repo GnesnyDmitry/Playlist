@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.search.data
 
 enum class StateMedialPlayer {
     STATE_PLAYING,

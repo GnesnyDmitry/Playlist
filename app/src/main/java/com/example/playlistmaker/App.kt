@@ -1,9 +1,9 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.preferenceStorage.TrackStorage
+import com.example.playlistmaker.search.data.TrackStorage
+import com.example.playlistmaker.setting.SHARED_PREFERENCE_THEME
 import com.google.gson.Gson
 
 class App : Application() {

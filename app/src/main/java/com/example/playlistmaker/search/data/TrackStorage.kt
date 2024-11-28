@@ -1,8 +1,7 @@
-package com.example.playlistmaker.preferenceStorage
+package com.example.playlistmaker.search.data
 
 import android.content.SharedPreferences
-import android.util.Log
-import com.example.playlistmaker.model.Track
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -11,7 +10,6 @@ class TrackStorage(
     private val gson: Gson
 ) {
     fun addTrack(track: Track) {
-        Log.d("eee", "Adding track: ${track.trackName}")
         val list: MutableList<Track> = getJsonString()?.toTrackList() ?: mutableListOf()
         if (list.contains(track)) list.remove(track)
         list.add(0, track)

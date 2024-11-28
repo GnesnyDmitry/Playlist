@@ -1,15 +1,12 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.search.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
-import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -23,20 +20,17 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.adapter.TrackAdapter
-import com.example.playlistmaker.model.Track
-import com.example.playlistmaker.okhttp.ITunesSearchApi
-import com.example.playlistmaker.okhttp.TrackResponse
-import com.example.playlistmaker.preferenceStorage.TrackStorage
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.playlistmaker.App
+import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.search.data.network.ITunesSearchApi
+import com.example.playlistmaker.search.presentation.SearchView
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity(), SearchView {
 
     private val iTunesBaseUrl = "https://itunes.apple.com"
     private lateinit var search: EditText
@@ -54,13 +48,20 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { sendSearchRequest() }
 
-    private val adapter = TrackAdapter(this::setOnClickTrack)
+    private val adapter = TrackAdapter()
 
     private val retrofit =
-        Retrofit.Builder().baseUrl(iTunesBaseUrl).addConverterFactory(GsonConverterFactory.create())
+        Retrofit.Builder()
+            .baseUrl(iTunesBaseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     private val iTunesService = retrofit.create(ITunesSearchApi::class.java)
+
+    private val presenter = Creator.createSearchPresenter(
+        this,
+        SearchRouter(this),
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,11 @@ class SearchActivity : AppCompatActivity() {
 
         placeholderNoConnection.isVisible = false
         placeholderNothingFound.isVisible = false
+
+        adapter.action = { track ->
+            App.instance.trackStorage.addTrack(track)
+            presenter.onClickedTrack(track)
+        }
 
         toolbar.setNavigationOnClickListener { finish() }
 
@@ -169,35 +175,7 @@ class SearchActivity : AppCompatActivity() {
             progressBar.isVisible = true
             recycler.isVisible = false
 
-            iTunesService.search(search.text.toString())
-                .enqueue(object : Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        progressBar.isVisible = false
-                        recycler.isVisible = true
-                        if (response.isSuccessful) {
-                            val bodyWithPreview = response.body()?.results?.filter { it.previewUrl != null }
-                            adapter.trackList.clear()
-                            if (!bodyWithPreview.isNullOrEmpty()) {
-                                adapter.trackList.addAll(bodyWithPreview)
-                                adapter.notifyDataSetChanged()
-                                hideAllPlaceholders()
-                            }
-                            if (adapter.trackList.isEmpty()) {
-                                showPlaceholderNothingFound() // если треков не найдено
-                            }
-                        } else {
-                            showPlaceholderNoConnection() // если возникла ошибка
-                        }
-                    }
-
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        progressBar.isVisible = false
-                        showPlaceholderNoConnection() // если произошла ошибка
-                    }
-                })
+            presenter.searchTrack(search.text.toString())
         }
     }
 
@@ -217,22 +195,38 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun hideHeaderAndFooter() {
+    override fun showTrackList() {
+        progressBar.isVisible = false
+        recycler.isVisible = true
+    }
+
+    override fun setTrackList(bodyResponse: List<Track>) {
+        adapter.trackList.addAll(bodyResponse)
+        adapter.notifyDataSetChanged()
+        hideAllPlaceholders()
+    }
+
+    override fun showLoadingTrackList() {
+        progressBar.isVisible = true
+        recycler.isVisible = false
+    }
+
+    override fun hideHeaderAndFooter() {
         btnClearHistory.isVisible = false
         header.isVisible = false
     }
 
-    private fun hideAllPlaceholders() {
+    override fun hideAllPlaceholders() {
         placeholderNoConnection.isVisible = false
         placeholderNothingFound.isVisible = false
     }
 
-    private fun showPlaceholderNoConnection() {
+    override fun showPlaceholderNoConnection() {
         hideAllPlaceholders()
         placeholderNoConnection.isVisible = true
     }
 
-    private fun showPlaceholderNothingFound() {
+    override fun showPlaceholderNothingFound() {
         hideAllPlaceholders()
         placeholderNothingFound.isVisible = true
     }
@@ -246,14 +240,6 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
         search.setText(searchText)
-    }
-
-    private fun setOnClickTrack(track: Track) {
-        App.instance.trackStorage.addTrack(track)
-        val intent = Intent(this, PlayerActivity::class.java).apply {
-            putExtra(TRACK_KEY, track)
-        }
-        startActivity(intent)
     }
 
     companion object {
