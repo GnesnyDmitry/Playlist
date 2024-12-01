@@ -1,4 +1,4 @@
-package com.example.playlistmaker.setting
+package com.example.playlistmaker.setting.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -10,13 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.App
 import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.setting.presentation.SettingsView
+import com.example.playlistmaker.tools.SHARED_PREFERENCE_THEME
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-const val SHARED_PREFERENCE_THEME = "shared_preference_theme"
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(), SettingsView {
+
+    private lateinit var themeSwitcher: SwitchMaterial
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +33,22 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val sharedPrefsTheme = getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
-        val editor = sharedPrefsTheme.edit()
 
         val toolbarSettings = findViewById<Toolbar>(R.id.settings_root_toolbar)
         val btnShareApp = findViewById<Button>(R.id.btn_share_app)
         val btnContactSupport = findViewById<Button>(R.id.btn_contact_support)
         val btnThermsUse = findViewById<Button>(R.id.btn_therms_use)
-        val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switcher)
+        themeSwitcher = findViewById(R.id.theme_switcher)
+
+        val presenter = Creator.createSettingsPresenter(
+            view = this,
+            router = SettingsRouter(this),
+            sharedPreferences = sharedPrefsTheme
+        )
+        presenter.setTheme()
 
         toolbarSettings.setNavigationOnClickListener {
-            finish()
+            presenter.onClickedBack()
         }
 
         btnShareApp.setOnClickListener {
@@ -53,14 +62,8 @@ class SettingsActivity : AppCompatActivity() {
         btnThermsUse.setOnClickListener {
             thermsUse()
         }
-
-        val switchState = sharedPrefsTheme.getBoolean("THEME_STATE", false)
-        themeSwitcher.isChecked = switchState
-
-        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
-            editor.putBoolean("THEME_STATE", checked)
-            editor.apply()
+        themeSwitcher.setOnClickListener {
+            presenter.setNewSwitcherTheme()
         }
     }
 
@@ -91,4 +94,13 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(this)
         }
     }
+
+    override fun setThemeSwitcher(isChecked: Boolean) {
+        themeSwitcher.isChecked = isChecked
+    }
+
+    override fun onThemeSwitchChanged(): Boolean {
+        return themeSwitcher.isChecked
+    }
+
 }

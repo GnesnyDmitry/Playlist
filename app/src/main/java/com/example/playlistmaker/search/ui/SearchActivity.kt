@@ -50,14 +50,6 @@ class SearchActivity : AppCompatActivity(), SearchView {
 
     private val adapter = TrackAdapter()
 
-    private val retrofit =
-        Retrofit.Builder()
-            .baseUrl(iTunesBaseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-    private val iTunesService = retrofit.create(ITunesSearchApi::class.java)
-
     private val presenter = Creator.createSearchPresenter(
         this,
         SearchRouter(this),

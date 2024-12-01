@@ -10,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.media.MediaActivity
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.ui.SearchActivity
-import com.example.playlistmaker.setting.SettingsActivity
+import com.example.playlistmaker.setting.ui.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

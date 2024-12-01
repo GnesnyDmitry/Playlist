@@ -3,7 +3,8 @@ package com.example.playlistmaker
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.search.data.TrackStorage
-import com.example.playlistmaker.setting.SHARED_PREFERENCE_THEME
+import com.example.playlistmaker.tools.SHARED_PREFERENCE_THEME
+import com.example.playlistmaker.tools.THEME_KEY
 import com.google.gson.Gson
 
 class App : Application() {
@@ -20,7 +21,7 @@ class App : Application() {
 
         val sharedPrefs = getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
 
-        switchTheme(sharedPrefs.getBoolean("THEME_STATE", false))
+        switchTheme(sharedPrefs.getBoolean(THEME_KEY, false))
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
