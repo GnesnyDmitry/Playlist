@@ -12,12 +12,4 @@ class SettingsInteractorImpl(private val settingsRepository: SettingsRepository)
     override fun updateThemeState(isDarkTheme: Boolean) {
         settingsRepository.setDarkTheme(isDarkTheme)
     }
-
-    override fun setThemeForApp() {
-        when(settingsRepository.isDarkThemeEnable()) {
-            false -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            true -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
-    }
-
 }

@@ -59,19 +59,19 @@ object Creator {
         )
     }
 
-    private fun getSettingsRepository(sharedPreferences: SharedPreferences): SettingsRepository {
-        return SettingsRepositoryImpl(sharedPreferences)
+    private fun getSettingsRepository(): SettingsRepository {
+        return SettingsRepositoryImpl()
     }
 
-    private fun provideSettingsInteractor(sharedPreferences: SharedPreferences): SettingsInteractor {
-        return SettingsInteractorImpl(getSettingsRepository(sharedPreferences))
+    private fun provideSettingsInteractor(): SettingsInteractor {
+        return SettingsInteractorImpl(getSettingsRepository())
     }
 
-    fun createSettingsPresenter(view: SettingsView, router: SettingsRouter, sharedPreferences: SharedPreferences): SettingsPresenter {
+    fun createSettingsPresenter(view: SettingsView, router: SettingsRouter): SettingsPresenter {
         return SettingsPresenter(
             view = view,
             router = router,
-            interactor = provideSettingsInteractor(sharedPreferences)
+            interactor = provideSettingsInteractor()
         )
     }
 }

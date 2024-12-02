@@ -8,15 +8,13 @@ class SettingsPresenter(
     private val router: SettingsRouter,
     private val interactor: SettingsInteractor
 ) {
-    fun setTheme() {
-        interactor.setThemeForApp()
+    fun setThemeSwitcher() {
         view.setThemeSwitcher(interactor.getCurrentThemeState())
     }
 
     fun setNewSwitcherTheme() {
         interactor.updateThemeState(view.onThemeSwitchChanged())
         view.setThemeSwitcher(interactor.getCurrentThemeState())
-        interactor.setThemeForApp()
     }
 
     fun onClickedBack() {
