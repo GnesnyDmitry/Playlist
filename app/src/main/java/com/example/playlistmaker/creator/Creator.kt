@@ -35,8 +35,6 @@ object Creator {
 
     private val sharedPreferenceTheme = App.instance.getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
 
-    private val themeSwitcher = ThemeSwitcherImpl(sharedPreferenceTheme)
-
     private fun getTracksRepository(): TrackRepository {
         return TrackRepositoryImpl(RetrofitNetworkClient(), DtoTrackMapper())
     }
