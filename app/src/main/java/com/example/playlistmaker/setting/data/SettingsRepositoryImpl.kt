@@ -6,9 +6,9 @@ import com.example.playlistmaker.App
 import com.example.playlistmaker.setting.domain.api.SettingsRepository
 import com.example.playlistmaker.tools.THEME_KEY
 
-class SettingsRepositoryImpl() : SettingsRepository {
-
-    private val themeSwitcher = App.instance.themeSwitcher
+class SettingsRepositoryImpl(
+    private val themeSwitcher: ThemeSwitcher
+) : SettingsRepository {
 
     override fun isDarkThemeEnable(): Boolean {
         return themeSwitcher.getTheme()

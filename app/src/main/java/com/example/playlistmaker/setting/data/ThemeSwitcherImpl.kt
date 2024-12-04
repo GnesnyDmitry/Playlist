@@ -1,11 +1,14 @@
 package com.example.playlistmaker.setting.data
 
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.App
 import com.example.playlistmaker.tools.THEME_KEY
 
-class ThemeSwitcherImpl(private val sharedPreferences: SharedPreferences) :
-    ThemeSwitcher {
+class ThemeSwitcherImpl(
+    private val sharedPreferences: SharedPreferences
+) : ThemeSwitcher {
 
     init {
         switchTheme(getTheme())
