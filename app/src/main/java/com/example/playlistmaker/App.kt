@@ -1,15 +1,18 @@
 package com.example.playlistmaker
 
 import android.app.Application
-import android.content.Context
-import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.preferenceStorage.TrackStorage
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.search.data.TrackStorage
+import com.example.playlistmaker.setting.domain.api.SettingsInteractor
 import com.google.gson.Gson
+
 
 class App : Application() {
 
     internal lateinit var trackStorage: TrackStorage
     internal val gson = Gson()
+    internal lateinit var themeSwitcher: SettingsInteractor
+
 
     override fun onCreate() {
         super.onCreate()
@@ -18,20 +21,9 @@ class App : Application() {
         trackStorage =
             TrackStorage(getSharedPreferences(TRACKS_PREFERENCES, MODE_PRIVATE), gson)
 
-        val sharedPrefs = getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
-
-        switchTheme(sharedPrefs.getBoolean("THEME_STATE", false))
+        themeSwitcher = Creator.provideSettingsInteractor()
     }
 
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-    }
     companion object {
         const val TRACKS_PREFERENCES = "tracks_preferences"
         lateinit var instance: App
