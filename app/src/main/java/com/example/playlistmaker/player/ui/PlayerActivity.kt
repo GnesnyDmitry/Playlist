@@ -3,24 +3,27 @@ package com.example.playlistmaker.player.ui
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.ui.SearchActivity
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.player.presentation.PlayerPresenter
-import com.example.playlistmaker.player.presentation.PlayerView
+import com.example.playlistmaker.player.presentation.PlayerViewModel
+import com.example.playlistmaker.player.ui.model.PlayButtonState
 import com.example.playlistmaker.tools.getTimeFormat
 
-class PlayerActivity : AppCompatActivity(), PlayerView {
+class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAudioPlayerBinding
     private lateinit var btnPlay: ImageView
-    private var presenter: PlayerPresenter? = null
+    private val viewModel by lazy { ViewModelProvider(this,
+        PlayerViewModel.factory())[PlayerViewModel::class.java] }
+    private val router = PlayerRouter(this)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,19 +31,16 @@ class PlayerActivity : AppCompatActivity(), PlayerView {
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.toolbar.setNavigationOnClickListener { presenter?.onClickBtnBack() }
-
-        presenter = Creator.createPlayerPresenter(
-            view = this,
-            router = PlayerRouter(this)
-        )
+        binding.toolbar.setNavigationOnClickListener { router.goBack() }
 
         btnPlay = binding.btnPlay
 
         val track = getTrack()
 
         track.let {
+            track.previewUrl?.let { url -> viewModel.preparePlayer(url) }
             binding.apply {
+
                 Glide.with(root)
                     .load(it.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
                     .placeholder(R.drawable.player_placeholder)
@@ -59,29 +59,42 @@ class PlayerActivity : AppCompatActivity(), PlayerView {
         }
 
         btnPlay.setOnClickListener {
-            presenter?.onClickedBtnPlay()
+            viewModel.onClickedBtnPlay()
         }
+
+        viewModel.playBtnStateLiveData().observe(this) { state ->
+            when (state) {
+                PlayButtonState.PREPARED -> {
+                    changeImageForPlayButton(R.drawable.player_play)
+                }
+                PlayButtonState.PLAY -> {
+                    changeImageForPlayButton(R.drawable.player_pause)
+                }
+                PlayButtonState.PAUSE -> {
+                    changeImageForPlayButton(R.drawable.player_play)
+                }
+            }
+        }
+
+        viewModel.timeStateLiveData().observe(this) { updateTrackTimer(it)}
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter?.stopMediaPlayer()
-    }
+
 
     override fun onPause() {
         super.onPause()
-        presenter?.stopTrack()
+        viewModel.stopTrack()
     }
 
-    override fun changeImageForPlayButton(image: Int) {
+    private fun changeImageForPlayButton(image: Int) {
         btnPlay.setImageResource(image)
     }
 
-    override fun updateTrackTimer(time: Int) {
+    private fun updateTrackTimer(time: Int) {
         binding.currentTime.text = time.getTimeFormat()
     }
 
-    override fun getTrack(): Track {
+    private fun getTrack(): Track {
         val track: Track? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(SearchActivity.TRACK_KEY, Track::class.java)
         } else {

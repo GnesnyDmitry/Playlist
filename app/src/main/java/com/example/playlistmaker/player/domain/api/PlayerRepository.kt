@@ -1,10 +1,10 @@
 package com.example.playlistmaker.player.domain.api
 
-import com.example.playlistmaker.search.data.StateMedialPlayer
+import com.example.playlistmaker.player.ui.model.MediaPlayerState
 
 interface PlayerRepository {
 
-    var state: StateMedialPlayer
+    var state: MediaPlayerState
 
     fun prepareMediaPlayer(url: String)
     fun startTrack()
