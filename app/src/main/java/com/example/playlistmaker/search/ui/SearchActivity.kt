@@ -4,239 +4,183 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.App
-import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.search.data.network.ITunesSearchApi
-import com.example.playlistmaker.search.presentation.SearchView
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.playlistmaker.search.presentation.SearchViewModel
+import com.example.playlistmaker.search.ui.model.ClearBtnState
+import com.example.playlistmaker.search.ui.model.TrackListState
 
-class SearchActivity : AppCompatActivity(), SearchView {
+class SearchActivity : AppCompatActivity() {
 
-    private val iTunesBaseUrl = "https://itunes.apple.com"
-    private lateinit var search: EditText
-    private lateinit var clearing: ImageView
-    private lateinit var placeholderNoConnection: View
-    private lateinit var placeholderNothingFound: View
-    private lateinit var btnUpdate: Button
-    private lateinit var recycler: RecyclerView
-    private var searchText: String? = null
-    private lateinit var btnClearHistory: Button
-    private lateinit var header: TextView
-    private lateinit var toolbar: Toolbar
-    private lateinit var progressBar: ProgressBar
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { sendSearchRequest() }
-
-    private val adapter = TrackAdapter()
-
-    private val presenter = Creator.createSearchPresenter(
-        this,
-        SearchRouter(this),
-    )
+    private val binding by lazy { ActivitySearchBinding.inflate(layoutInflater) }
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            SearchViewModel.factory()
+        )[SearchViewModel::class.java]
+    }
+    private val trackAdapter = TrackAdapter()
+    private val router = SearchRouter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search_root)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContentView(binding.root)
+
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@SearchActivity)
+            adapter = trackAdapter
         }
 
-        search = findViewById(R.id.edittext_search_root)
-        clearing = findViewById(R.id.icon_clear_text)
-        placeholderNoConnection = findViewById(R.id.placeholder_no_connection)
-        placeholderNothingFound = findViewById(R.id.placeholder_nothing_found)
-        btnUpdate = findViewById(R.id.btn_update)
-        btnClearHistory = findViewById(R.id.btn_clear_history)
-        header = findViewById(R.id.header_search_root)
-        toolbar = findViewById(R.id.search_root_toolbar)
-        progressBar = findViewById(R.id.progressBar)
 
-
-        recycler = findViewById(R.id.recyclerView)
-        recycler.adapter = adapter
-
-        placeholderNoConnection.isVisible = false
-        placeholderNothingFound.isVisible = false
-
-        adapter.action = { track ->
-            App.instance.trackStorage.addTrack(track)
-            presenter.onClickedTrack(track)
+        trackAdapter.action = { track ->
+            router.openPlayerActivity(track)
+            viewModel.onClickedTrack(track)
         }
 
-        toolbar.setNavigationOnClickListener { finish() }
+        binding.searchRootToolbar.setNavigationOnClickListener { finish() }
 
-        if (savedInstanceState != null) {
-            searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
-            search.setText(searchText)
+
+        binding.edittextSearchRoot.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTextChange("$text")
         }
 
-        search.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Заглушка для будущих задач
-            }
+        binding.edittextSearchRoot.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) viewModel.onClickEditText("${binding.edittextSearchRoot.text}")
+        }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearing.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
-                searchText = s.toString()
-                if (s.isNullOrEmpty()) {
-                    showHistorySearch()
-                    hideAllPlaceholders()
-                } else {
-                    hideHeaderAndFooter()
-                    adapter.trackList.clear()
+        binding.btnClearHistory.setOnClickListener {
+            viewModel.onClickedBtnClearHistory()
+        }
+
+        binding.btnUpdate.setOnClickListener {
+            viewModel.onClickedRefresh("${binding.edittextSearchRoot.text}")
+        }
+
+        binding.iconClearText.setOnClickListener {
+            viewModel.onClickClearEditText()
+        }
+
+        viewModel.clearButtonStateLiveData().observe(this) { state ->
+            when (state!!) {
+                ClearBtnState.FOCUS -> showKeyboard(true)
+                ClearBtnState.TEXT -> clearBtnIsVisible(true)
+                ClearBtnState.DEFAULT -> {
+                    showKeyboard(false)
+                    clearBtnIsVisible(false)
                 }
-                searchDebounce()
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                // Заглушка для будущих задач
-            }
-        })
-
-        search.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && search.text.isEmpty()) {
-                showHistorySearch()
             }
         }
 
-        btnClearHistory.setOnClickListener {
-            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            hideKeyboard?.hideSoftInputFromWindow(clearing.windowToken, 0)
-            hideHeaderAndFooter()
-            App.instance.trackStorage.clearTracks()
-            adapter.trackList.clear()
-            adapter.notifyDataSetChanged()
-
-        }
-
-        // Логика для кнопки очистки текста
-        clearing.setOnClickListener {
-            search.text.clear()
-            val hideKeyboard = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            hideKeyboard?.hideSoftInputFromWindow(clearing.windowToken, 0)
-            clearing.isVisible = false
-            showHistorySearch()
-        }
-
-        btnUpdate.setOnClickListener {
-            if (search.text.isNotEmpty()) {
-                hideHeaderAndFooter()
-                sendSearchRequest()
-            }
-        }
-
-        search.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                if (search.text.isNotEmpty()) {
-                    hideHeaderAndFooter()
-                    sendSearchRequest()
+        viewModel.trackListStateLiveData().observe(this) { state ->
+            when (state) {
+                is TrackListState.Default -> showEmptyList()
+                is TrackListState.Loading -> showLoadingState()
+                is TrackListState.HistoryContent -> {
+                    if (state.list.isEmpty()) showEmptyList()
+                    else showHistoryTracks(list = state.list)
                 }
-                true
+                is TrackListState.SearchContent -> {
+                    showNewTracks(list = state.list)
+                }
+                is TrackListState.NoData -> showNoDataState()
+                is TrackListState.Error -> showErrorState()
             }
-            false
         }
+
     }
 
-    private fun sendSearchRequest() {
-        if (search.text.isNotEmpty()) {
-
-            progressBar.isVisible = true
-            recycler.isVisible = false
-
-            presenter.searchTrack(search.text.toString())
-        }
+    override fun onStop() {
+        super.onStop()
+        viewModel.onStop("${binding.edittextSearchRoot.text}")
     }
 
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, POST_DELAY_SEARCH_DEBOUNCE)
+    override fun onDestroy() {
+        super.onDestroy()
+        trackAdapter.action = null
     }
 
-    private fun showHistorySearch() {
-        val trackList = App.instance.trackStorage.getTrackList()
-        if (trackList.isNotEmpty()) {
-            header.isVisible = true
-            btnClearHistory.isVisible = true
-            adapter.trackList.clear()
-            adapter.trackList.addAll(trackList)
-            adapter.notifyDataSetChanged()
-        }
+    private fun showNewTracks(list: List<Track>) {
+        binding.progressBar.isVisible = false
+        binding.recyclerView.isVisible = true
+        binding.placeholderNothingFound.isVisible = false
+        binding.placeholderNoConnection.isVisible = false
+        setItems(list)
     }
 
-    override fun showTrackList() {
-        progressBar.isVisible = false
-        recycler.isVisible = true
+    private fun setItems(items: List<Track>) {
+        trackAdapter.trackList.clear()
+        trackAdapter.trackList.addAll(items)
+        trackAdapter.notifyDataSetChanged()
     }
 
-    override fun setTrackList(bodyResponse: List<Track>) {
-        adapter.trackList.addAll(bodyResponse)
-        adapter.notifyDataSetChanged()
-        hideAllPlaceholders()
+    private fun showNoDataState() {
+        binding.progressBar.isVisible = false
+        binding.recyclerView.isVisible = true
+        trackAdapter.trackList.clear()
+        binding.placeholderNothingFound.isVisible = true
+        binding.btnUpdate.isVisible = true
     }
 
-    override fun showLoadingTrackList() {
-        progressBar.isVisible = true
-        recycler.isVisible = false
+    private fun showErrorState() {
+        binding.progressBar.isVisible = false
+        binding.recyclerView.isVisible = true
+        trackAdapter.trackList.clear()
+        binding.placeholderNoConnection.isVisible = true
+        binding.btnUpdate.isVisible = false
     }
 
-    override fun hideHeaderAndFooter() {
-        btnClearHistory.isVisible = false
-        header.isVisible = false
+
+    private fun showEmptyList() {
+        binding.progressBar.isVisible = false
+        binding.placeholderNoConnection.isVisible = false
+        binding.placeholderNothingFound.isVisible = false
+        binding.recyclerView.isVisible = false
+        binding.headerSearchRoot.isVisible = false
+        binding.btnClearHistory.isVisible = false
+        trackAdapter.trackList.clear()
     }
 
-    override fun hideAllPlaceholders() {
-        placeholderNoConnection.isVisible = false
-        placeholderNothingFound.isVisible = false
+    private fun showLoadingState() {
+        showEmptyList()
+        binding.progressBar.isVisible = true
     }
 
-    override fun showPlaceholderNoConnection() {
-        hideAllPlaceholders()
-        placeholderNoConnection.isVisible = true
+    private fun showHistoryTracks(list: List<Track>) {
+        trackAdapter.trackList.clear()
+        binding.progressBar.isVisible = false
+        trackAdapter.trackList.addAll(list)
+        trackAdapter.notifyDataSetChanged()
+        binding.recyclerView.isVisible = true
+        binding.headerSearchRoot.isVisible = true
+        binding.btnClearHistory.isVisible = true
+
     }
 
-    override fun showPlaceholderNothingFound() {
-        hideAllPlaceholders()
-        placeholderNothingFound.isVisible = true
+    private fun showKeyboard(show: Boolean) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (show)
+            imm.showSoftInput(binding.edittextSearchRoot, 0)
+        else
+            imm.hideSoftInputFromWindow(binding.edittextSearchRoot.windowToken, 0)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_TEXT_KEY, searchText)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        searchText = savedInstanceState.getString(SEARCH_TEXT_KEY)
-        search.setText(searchText)
+    private fun clearBtnIsVisible(show: Boolean) {
+        binding.iconClearText.isVisible =
+            if (show) true
+            else {
+                binding.edittextSearchRoot.setText("")
+                false
+            }
     }
 
     companion object {
-        private const val SEARCH_TEXT_KEY = "SEARCH_TEXT"
         const val TRACK_KEY = "track"
-        private const val POST_DELAY_SEARCH_DEBOUNCE = 2000L
     }
 }

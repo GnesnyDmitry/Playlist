@@ -1,74 +1,58 @@
 package com.example.playlistmaker.creator
 
 import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import com.example.playlistmaker.App
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.player.domain.PlayerInteractorImpl
 import com.example.playlistmaker.player.domain.api.PlayerRepository
-import com.example.playlistmaker.player.presentation.PlayerPresenter
-import com.example.playlistmaker.player.ui.PlayerRouter
-import com.example.playlistmaker.player.presentation.PlayerView
 import com.example.playlistmaker.player.data.PlayerRepositoryImpl
 import com.example.playlistmaker.search.data.DtoTrackMapper
+import com.example.playlistmaker.search.data.GsonConverter
+import com.example.playlistmaker.search.data.LocalTrackStorage
 import com.example.playlistmaker.search.data.TrackRepositoryImpl
 import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.search.domain.api.TrackInteractor
 import com.example.playlistmaker.search.domain.api.TrackRepository
 import com.example.playlistmaker.search.domain.TrackInteractorImpl
-import com.example.playlistmaker.search.presentation.SearchPresenter
-import com.example.playlistmaker.search.ui.SearchRouter
-import com.example.playlistmaker.search.presentation.SearchView
 import com.example.playlistmaker.setting.data.SettingsRepositoryImpl
 import com.example.playlistmaker.setting.data.ThemeSwitcher
 import com.example.playlistmaker.setting.data.ThemeSwitcherImpl
 import com.example.playlistmaker.setting.domain.SettingsInteractorImpl
 import com.example.playlistmaker.setting.domain.api.SettingsInteractor
 import com.example.playlistmaker.setting.domain.api.SettingsRepository
-import com.example.playlistmaker.setting.presentation.SettingsPresenter
-import com.example.playlistmaker.setting.ui.SettingsRouter
-import com.example.playlistmaker.setting.presentation.SettingsView
 
 object Creator {
 
-    private const val SHARED_PREFERENCE_THEME = "tracks_preferences"
+    private const val APP_PREFERENCES = "app_preference"
 
-    private val sharedPreferenceTheme = App.instance.getSharedPreferences(SHARED_PREFERENCE_THEME, MODE_PRIVATE)
+    private val sharedPreference = App.instance.getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE)
+
+    private fun getGsonConverter(): GsonConverter {
+        return GsonConverter(App.instance.gson)
+    }
+
+    private fun getLocalTrackStorage(): LocalTrackStorage {
+        return LocalTrackStorage(getGsonConverter(), sharedPreference)
+    }
 
     private fun getTracksRepository(): TrackRepository {
-        return TrackRepositoryImpl(RetrofitNetworkClient(), DtoTrackMapper())
+        return TrackRepositoryImpl(RetrofitNetworkClient(), DtoTrackMapper(), getLocalTrackStorage())
     }
 
-    private fun provideTracksInteractor(): TrackInteractor {
+    fun provideTracksInteractor(): TrackInteractor {
         return TrackInteractorImpl(getTracksRepository())
-    }
-
-    fun createSearchPresenter(searchView: SearchView, router: SearchRouter): SearchPresenter {
-        return SearchPresenter(
-            view = searchView,
-            router = router,
-            searchInteractor = provideTracksInteractor()
-        )
     }
 
     private fun getPlayerRepository(): PlayerRepository {
         return PlayerRepositoryImpl()
     }
 
-    private fun providePlayerInteractor(): PlayerInteractor {
+    fun providePlayerInteractor(): PlayerInteractor {
         return PlayerInteractorImpl(getPlayerRepository())
     }
 
-    fun createPlayerPresenter(view: PlayerView, router: PlayerRouter): PlayerPresenter {
-        return PlayerPresenter(
-            view = view,
-            router = router,
-            interactor = providePlayerInteractor()
-        )
-    }
-
     private fun getThemeSwitcher(): ThemeSwitcher {
-        return ThemeSwitcherImpl(sharedPreferenceTheme)
+        return ThemeSwitcherImpl(sharedPreference)
     }
 
     private fun getSettingsRepository(): SettingsRepository {
@@ -79,11 +63,4 @@ object Creator {
         return SettingsInteractorImpl(getSettingsRepository())
     }
 
-    fun createSettingsPresenter(view: SettingsView, router: SettingsRouter): SettingsPresenter {
-        return SettingsPresenter(
-            view = view,
-            router = router,
-            interactor = provideSettingsInteractor()
-        )
-    }
 }
