@@ -24,6 +24,8 @@ class DtoTrackMapper {
                 previewUrl = it.previewUrl
             )
         }.filter { it.previewUrl != null }
-        return ResponseState.Content(data)
+        return if (data.isNotEmpty()) {
+            ResponseState.Content(data)
+        } else ResponseState.NoData()
     }
 }

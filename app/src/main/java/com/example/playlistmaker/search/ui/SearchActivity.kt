@@ -2,20 +2,17 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.App
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.search.ui.model.ClearBtnState
-import com.example.playlistmaker.search.ui.model.TrackListState
+import com.example.playlistmaker.search.ui.model.SearchViewState
 
 class SearchActivity : AppCompatActivity() {
 
@@ -67,30 +64,20 @@ class SearchActivity : AppCompatActivity() {
             viewModel.onClickClearEditText()
         }
 
-        viewModel.clearButtonStateLiveData().observe(this) { state ->
-            when (state!!) {
-                ClearBtnState.FOCUS -> showKeyboard(true)
-                ClearBtnState.TEXT -> clearBtnIsVisible(true)
-                ClearBtnState.DEFAULT -> {
-                    showKeyboard(false)
-                    clearBtnIsVisible(false)
-                }
-            }
-        }
-
-        viewModel.trackListStateLiveData().observe(this) { state ->
+        viewModel.searchViewStateLiveData().observe(this) { state ->
             when (state) {
-                is TrackListState.Default -> showEmptyList()
-                is TrackListState.Loading -> showLoadingState()
-                is TrackListState.HistoryContent -> {
+                is SearchViewState.Default -> showEmptyList()
+                is SearchViewState.Loading -> showLoadingState()
+                is SearchViewState.HistoryContent -> {
                     if (state.list.isEmpty()) showEmptyList()
                     else showHistoryTracks(list = state.list)
                 }
-                is TrackListState.SearchContent -> {
+                is SearchViewState.SearchContent -> {
                     showNewTracks(list = state.list)
                 }
-                is TrackListState.NoData -> showNoDataState()
-                is TrackListState.Error -> showErrorState()
+                is SearchViewState.NoData -> showNoDataState()
+                is SearchViewState.Error -> showErrorState()
+                is SearchViewState.ClearBtn -> updateClearBtState(state.state)
             }
         }
 
@@ -104,6 +91,15 @@ class SearchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         trackAdapter.action = null
+    }
+
+    private fun updateClearBtState(state: Enum<ClearBtnState>) {
+        if (state == ClearBtnState.TEXT) {
+            clearBtnIsVisible(true)
+        } else {
+            showKeyboard(false)
+            clearBtnIsVisible(false)
+        }
     }
 
     private fun showNewTracks(list: List<Track>) {

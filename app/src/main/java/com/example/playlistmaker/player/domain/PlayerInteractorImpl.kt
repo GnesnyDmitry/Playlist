@@ -18,7 +18,7 @@ class PlayerInteractorImpl(private val medialPlayer: PlayerRepository) : PlayerI
         return medialPlayer.getTime()
     }
 
-    override fun setStopListener(action: () -> Unit) {
+    override fun onTrackEnd(action: () -> Unit) {
         medialPlayer.setStopListener(action)
     }
 

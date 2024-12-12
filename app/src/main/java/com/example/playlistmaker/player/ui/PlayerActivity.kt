@@ -15,6 +15,7 @@ import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.player.ui.model.PlayButtonState
+import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.tools.getTimeFormat
 
 class PlayerActivity : AppCompatActivity() {
@@ -64,30 +65,36 @@ class PlayerActivity : AppCompatActivity() {
 
         viewModel.playBtnStateLiveData().observe(this) { state ->
             when (state) {
-                PlayButtonState.PREPARED -> {
-                    changeImageForPlayButton(R.drawable.player_play)
+                is PlayerViewState.PlayBtn -> {
+                    when (state.state) {
+                        PlayButtonState.PREPARED -> {
+                            updateTrackTimer(0)
+                            changeImageForPlayButton(R.drawable.player_play)
+                        }
+                        PlayButtonState.PLAY -> {
+                            changeImageForPlayButton(R.drawable.player_pause)
+                        }
+                        PlayButtonState.PAUSE -> {
+                            changeImageForPlayButton(R.drawable.player_play)
+                        }
+                    }
                 }
-                PlayButtonState.PLAY -> {
-                    changeImageForPlayButton(R.drawable.player_pause)
-                }
-                PlayButtonState.PAUSE -> {
-                    changeImageForPlayButton(R.drawable.player_play)
+                is PlayerViewState.TrackTime -> {
+                    updateTrackTimer(state.state)
                 }
             }
         }
-
-        viewModel.timeStateLiveData().observe(this) { updateTrackTimer(it)}
     }
-
-
 
     override fun onPause() {
         super.onPause()
         viewModel.stopTrack()
     }
 
-    private fun changeImageForPlayButton(image: Int) {
-        btnPlay.setImageResource(image)
+    private fun changeImageForPlayButton(image: Int?) {
+        image?.let {
+            btnPlay.setImageResource(image)
+        }
     }
 
     private fun updateTrackTimer(time: Int) {

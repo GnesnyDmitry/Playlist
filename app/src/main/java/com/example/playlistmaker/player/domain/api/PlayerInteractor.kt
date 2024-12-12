@@ -6,7 +6,7 @@ interface PlayerInteractor {
     fun prepareMediaPlayer(url: String)
     fun startTrack()
     fun getTime(): Int
-    fun setStopListener(action: () -> Unit)
+    fun onTrackEnd(action: () -> Unit)
     fun stopTrack()
     fun stopMediaPlayer()
     fun getState(): MediaPlayerState

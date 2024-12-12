@@ -12,16 +12,14 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.ui.model.MediaPlayerState
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.player.ui.model.PlayButtonState
+import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.tools.DELAY300L
-import com.example.playlistmaker.tools.SingleLiveEvent
 
 class PlayerViewModel(private val interactor: PlayerInteractor): ViewModel() {
 
-    private val playBtnState = SingleLiveEvent<PlayButtonState>()
-    private val timeState = MutableLiveData<Int>()
+    private val playerViewState = MutableLiveData<PlayerViewState>()
 
-    fun playBtnStateLiveData(): LiveData<PlayButtonState> = playBtnState
-    fun timeStateLiveData(): LiveData<Int> = timeState
+    fun playBtnStateLiveData(): LiveData<PlayerViewState> = playerViewState
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -32,35 +30,35 @@ class PlayerViewModel(private val interactor: PlayerInteractor): ViewModel() {
     }
 
     fun preparePlayer(url: String) {
-        playBtnState.postValue(PlayButtonState.PREPARED)
+        playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
         interactor.prepareMediaPlayer(url)
-        interactor.setStopListener {
-            playBtnState.postValue(PlayButtonState.PREPARED)
+        interactor.onTrackEnd {
+            playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
             handler.removeCallbacksAndMessages(null)
         }
     }
 
     fun stopTrack() {
-        playBtnState.value = PlayButtonState.PAUSE
+        playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PAUSE))
         interactor.stopTrack()
         handler.removeCallbacksAndMessages(null)
     }
 
     fun onClickedBtnPlay() {
         when (interactor.getState()) {
-            MediaPlayerState.PREPARED -> startTrack()
+            MediaPlayerState.PREPARED -> onTrackStart()
             MediaPlayerState.PLAYING -> stopTrack()
-            MediaPlayerState.PAUSED -> startTrack()
-            MediaPlayerState.DEFAULT -> playBtnState.postValue(PlayButtonState.PREPARED)
+            MediaPlayerState.PAUSED -> onTrackStart()
+            MediaPlayerState.DEFAULT -> playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
         }
     }
 
-    private fun startTrack() {
-        playBtnState.value = PlayButtonState.PLAY
+    private fun onTrackStart() {
+        playerViewState.value = PlayerViewState.PlayBtn(PlayButtonState.PLAY)
         interactor.startTrack()
         handler.post(object : Runnable {
             override fun run() {
-                timeState.postValue(interactor.getTime())
+                playerViewState.postValue(PlayerViewState.TrackTime(interactor.getTime()))
                 handler.postDelayed(this, DELAY300L)
             }
         })

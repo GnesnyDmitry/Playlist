@@ -17,11 +17,8 @@ import com.example.playlistmaker.search.domain.ResponseState.NoConnect
 import com.example.playlistmaker.search.domain.ResponseState.NoData
 import com.example.playlistmaker.search.domain.api.TrackInteractor
 import com.example.playlistmaker.search.ui.model.ClearBtnState
-import com.example.playlistmaker.search.ui.model.TrackListState
-import com.example.playlistmaker.tools.DELAY300L
-import com.example.playlistmaker.tools.SingleLiveEvent
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
+import com.example.playlistmaker.search.ui.model.SearchViewState
+import com.example.playlistmaker.tools.DELAY800L
 import java.util.concurrent.Executors
 
 class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel() {
@@ -31,11 +28,9 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     private var latestText: String = ""
     private val executor = Executors.newFixedThreadPool(4)
 
-    private val trackListState = MutableLiveData<TrackListState>()
-    private val clearBtnState = SingleLiveEvent<ClearBtnState>()
+    private val searchViewState = MutableLiveData<SearchViewState>()
 
-    fun trackListStateLiveData(): LiveData<TrackListState> = trackListState
-    fun clearButtonStateLiveData(): LiveData<ClearBtnState> = clearBtnState
+    fun searchViewStateLiveData(): LiveData<SearchViewState> = searchViewState
 
 
     init {
@@ -51,26 +46,27 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     }
 
     fun onClickClearEditText() {
-        clearBtnState.value = ClearBtnState.DEFAULT
+        searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.DEFAULT)
         latestText = ""
         showHistoryContent()
     }
 
     fun onClickedBtnClearHistory() {
-        trackListState.postValue(TrackListState.Default)
+        searchViewState.postValue(SearchViewState.Default)
         searchInteractor.clearTrackLocalStorage(HISTORY_KEY)
     }
 
     fun onTextChange(text: String) {
         defineState(text)
-        if (text.isEmpty())
+        if (text.isEmpty()) {
+            handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+
             showHistoryContent()
-        else
-            searchDebounce(text)
+        } else searchDebounce(text)
     }
 
     fun onClickedRefresh(text: String) {
-        trackListState.value = TrackListState.Loading
+        searchViewState.value = SearchViewState.Loading
         getSearch(text)
     }
 
@@ -79,10 +75,10 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     }
 
     private fun showHistoryContent() {
-        trackListState.value = TrackListState.Loading
+        searchViewState.value = SearchViewState.Loading
         executor.execute {
-            trackListState.postValue(
-                TrackListState.HistoryContent(
+            searchViewState.postValue(
+                SearchViewState.HistoryContent(
                     searchInteractor.getTracksFromLocalStorage(HISTORY_KEY)
                 )
             )
@@ -95,30 +91,28 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
         latestText = text
         handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
         val runnable = Runnable { getSearch(query = text) }
-        val postTime = SystemClock.uptimeMillis() + DELAY300L
+        val postTime = SystemClock.uptimeMillis() + DELAY800L
         handler.postAtTime(runnable, SEARCH_REQUEST_TOKEN, postTime)
     }
 
     private fun getSearch(query: String) {
         executor.execute {
             searchInteractor.searchTracks(query) { response ->
+                println("qqq ${response}")
                 when (response) {
-                    is NoConnect -> trackListState.postValue(TrackListState.Error)
-                    is Error -> trackListState.postValue(TrackListState.Error)
-                    is NoData -> trackListState.postValue(TrackListState.NoData(response.data))
-                    is Content -> trackListState.postValue(TrackListState.SearchContent(response.data))
+                    is NoConnect -> searchViewState.postValue(SearchViewState.Error)
+                    is Error -> searchViewState.postValue(SearchViewState.Error)
+                    is NoData -> searchViewState.postValue(SearchViewState.NoData(response.data))
+                    is Content -> searchViewState.postValue(SearchViewState.SearchContent(response.data))
                 }
             }
         }
-
-        trackListState.value = TrackListState.Loading
-        println("qqq ${Thread.currentThread().name}")
-
+        searchViewState.value = SearchViewState.Loading
     }
 
     private fun defineState(text: String) {
         if (text.isNotEmpty()) {
-            clearBtnState.value = ClearBtnState.TEXT
+            searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.TEXT)
         }
     }
 
