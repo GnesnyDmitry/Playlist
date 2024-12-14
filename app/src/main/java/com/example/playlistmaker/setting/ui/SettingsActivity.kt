@@ -10,62 +10,51 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.setting.presentation.SettingsView
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.setting.presentation.SettingsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 
-class SettingsActivity : AppCompatActivity(), SettingsView {
+class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var themeSwitcher: SwitchMaterial
+    private val binding by lazy { ActivitySettingsBinding.inflate(layoutInflater) }
+    private val viewModel by lazy { ViewModelProvider(this,
+        SettingsViewModel.factory())[SettingsViewModel::class.java] }
+    private val router = SettingsRouter(this)
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings_root)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setContentView(binding.root)
+
+        viewModel.themeStateLiveData().observe(this) {
+            binding.themeSwitcher.isChecked = it
         }
 
-        val toolbarSettings = findViewById<Toolbar>(R.id.settings_root_toolbar)
-        val btnShareApp = findViewById<Button>(R.id.btn_share_app)
-        val btnContactSupport = findViewById<Button>(R.id.btn_contact_support)
-        val btnThermsUse = findViewById<Button>(R.id.btn_therms_use)
-        themeSwitcher = findViewById(R.id.theme_switcher)
+       binding.settingsRootToolbar.setNavigationOnClickListener {
+            router.goBack()
+       }
 
-        val presenter = Creator.createSettingsPresenter(
-            view = this,
-            router = SettingsRouter(this),
-        )
-
-        toolbarSettings.setNavigationOnClickListener {
-            presenter.onClickedBack()
-        }
-
-        btnShareApp.setOnClickListener {
+        binding.btnShareApp.setOnClickListener {
             shareApp()
         }
 
-        btnContactSupport.setOnClickListener {
+        binding.btnContactSupport.setOnClickListener {
             contactSupport()
         }
 
-        btnThermsUse.setOnClickListener {
+        binding.btnThermsUse.setOnClickListener {
             thermsUse()
         }
 
-        presenter.setThemeSwitcher()
-
-        themeSwitcher.setOnClickListener {
-            presenter.setNewSwitcherTheme()
-        }
+       binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+           viewModel.changeTheme(isChecked)
+       }
     }
-
-
 
     private fun shareApp() {
         Intent(Intent.ACTION_SEND).apply {
@@ -92,13 +81,4 @@ class SettingsActivity : AppCompatActivity(), SettingsView {
             startActivity(this)
         }
     }
-
-    override fun setThemeSwitcher(isChecked: Boolean) {
-        themeSwitcher.isChecked = isChecked
-    }
-
-    override fun onThemeSwitchChanged(): Boolean {
-        return themeSwitcher.isChecked
-    }
-
 }

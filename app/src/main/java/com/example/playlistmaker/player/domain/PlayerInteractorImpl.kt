@@ -1,6 +1,6 @@
 package com.example.playlistmaker.player.domain
 
-import com.example.playlistmaker.search.data.StateMedialPlayer
+import com.example.playlistmaker.player.ui.model.MediaPlayerState
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.player.domain.api.PlayerRepository
 
@@ -18,7 +18,7 @@ class PlayerInteractorImpl(private val medialPlayer: PlayerRepository) : PlayerI
         return medialPlayer.getTime()
     }
 
-    override fun setStopListener(action: () -> Unit) {
+    override fun onTrackEnd(action: () -> Unit) {
         medialPlayer.setStopListener(action)
     }
 
@@ -30,7 +30,7 @@ class PlayerInteractorImpl(private val medialPlayer: PlayerRepository) : PlayerI
         medialPlayer.stopMediaPlayer()
     }
 
-    override fun getState(): StateMedialPlayer {
+    override fun getState(): MediaPlayerState {
         return medialPlayer.state
     }
 }
