@@ -9,17 +9,10 @@ import com.example.playlistmaker.search.data.dto.TrackSearchRequest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitNetworkClient : NetworkClient {
-
-    private val imdbBaseUrl = "https://itunes.apple.com"
-    private val context = App.instance
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(imdbBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val imdbService = retrofit.create(ITunesSearchApi::class.java)
+class RetrofitNetworkClient(
+    private val imdbService: ITunesSearchApi,
+    private val context: Context,
+) : NetworkClient {
 
     override fun doRequest(dto: Any): Response {
 
