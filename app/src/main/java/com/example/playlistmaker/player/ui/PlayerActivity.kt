@@ -3,33 +3,31 @@ package com.example.playlistmaker.player.ui
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.ui.SearchActivity
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
+import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.player.ui.model.PlayButtonState
 import com.example.playlistmaker.player.ui.model.PlayerViewState
 import com.example.playlistmaker.tools.getTimeFormat
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityAudioPlayerBinding
+    private val binding by lazy { ActivityAudioPlayerBinding.inflate(layoutInflater) }
     private lateinit var btnPlay: ImageView
-    private val viewModel by lazy { ViewModelProvider(this,
-        PlayerViewModel.factory())[PlayerViewModel::class.java] }
+    private val viewModel by viewModel<PlayerViewModel>()
     private val router = PlayerRouter(this)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.toolbar.setNavigationOnClickListener { router.goBack() }
@@ -90,6 +88,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onPause()
         viewModel.stopTrack()
     }
+
 
     private fun changeImageForPlayButton(image: Int?) {
         image?.let {

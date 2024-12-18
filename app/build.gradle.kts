@@ -48,8 +48,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converterGson)
     implementation(libs.gson)
-
-
+    //Koin
+    implementation(libs.koin)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

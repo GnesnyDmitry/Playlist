@@ -21,46 +21,46 @@ import com.example.playlistmaker.setting.domain.SettingsInteractorImpl
 import com.example.playlistmaker.setting.domain.api.SettingsInteractor
 import com.example.playlistmaker.setting.domain.api.SettingsRepository
 
-object Creator {
-
-    private const val APP_PREFERENCES = "app_preference"
-
-    private val sharedPreference = App.instance.getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE)
-
-    private fun getGsonConverter(): GsonConverter {
-        return GsonConverter(App.instance.gson)
-    }
-
-    private fun getLocalTrackStorage(): LocalTrackStorage {
-        return LocalTrackStorage(getGsonConverter(), sharedPreference)
-    }
-
-    private fun getTracksRepository(): TrackRepository {
-        return TrackRepositoryImpl(RetrofitNetworkClient(), DtoTrackMapper(), getLocalTrackStorage())
-    }
-
-    fun provideTracksInteractor(): TrackInteractor {
-        return TrackInteractorImpl(getTracksRepository())
-    }
-
-    private fun getPlayerRepository(): PlayerRepository {
-        return PlayerRepositoryImpl()
-    }
-
-    fun providePlayerInteractor(): PlayerInteractor {
-        return PlayerInteractorImpl(getPlayerRepository())
-    }
-
-    private fun getThemeSwitcher(): ThemeSwitcher {
-        return ThemeSwitcherImpl(sharedPreference)
-    }
-
-    private fun getSettingsRepository(): SettingsRepository {
-        return SettingsRepositoryImpl(getThemeSwitcher())
-    }
-
-    fun provideSettingsInteractor(): SettingsInteractor {
-        return SettingsInteractorImpl(getSettingsRepository())
-    }
-
-}
+//object Creator {
+//
+//
+//
+//    private val sharedPreference = App.instance.getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE)
+//
+//    private fun getGsonConverter(): GsonConverter {
+//        return GsonConverter(App.instance.gson)
+//    }
+//
+//    private fun getLocalTrackStorage(): LocalTrackStorage {
+//        return LocalTrackStorage(getGsonConverter(), sharedPreference)
+//    }
+//
+//    private fun getTracksRepository(): TrackRepository {
+//        return TrackRepositoryImpl(RetrofitNetworkClient(), DtoTrackMapper(), getLocalTrackStorage())
+//    }
+//
+//    fun provideTracksInteractor(): TrackInteractor {
+//        return TrackInteractorImpl(getTracksRepository())
+//    }
+//
+//    private fun getPlayerRepository(): PlayerRepository {
+//        return PlayerRepositoryImpl()
+//    }
+//
+//    fun providePlayerInteractor(): PlayerInteractor {
+//        return PlayerInteractorImpl(getPlayerRepository())
+//    }
+//
+//    private fun getThemeSwitcher(): ThemeSwitcher {
+//        return ThemeSwitcherImpl(sharedPreference)
+//    }
+//
+//    private fun getSettingsRepository(): SettingsRepository {
+//        return SettingsRepositoryImpl(getThemeSwitcher())
+//    }
+//
+//    fun provideSettingsInteractor(): SettingsInteractor {
+//        return SettingsInteractorImpl(getSettingsRepository())
+//    }
+//
+//}
