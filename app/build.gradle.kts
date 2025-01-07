@@ -50,6 +50,11 @@ dependencies {
     implementation(libs.gson)
     //Koin
     implementation(libs.koin)
+    //Fragments
+    implementation(libs.fragments)
+    //ViewPager2
+    implementation(libs.viewpager2)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

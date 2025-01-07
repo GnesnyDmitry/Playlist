@@ -21,7 +21,9 @@
     <color name="activity_root">#3772E7</color>
 
     <color name="search_root">#FFFFFFFF</color>
-    <color name="text_btn_update">#FFFFFFFF</color>
+    <color name="text_for_rounded_btn">#FFFFFFFF</color>
+    <color name="text_for_tabs">#1A1B22</color>
+    <color name="color_for_tab_line">#1A1B22</color>
     <color name="search_root_text">#1A1B22</color>
     <color name="edittext_bar_search_root">#E6E8EB</color>
     <color name="edittext_text_search_root">#AEAFB4</color>
