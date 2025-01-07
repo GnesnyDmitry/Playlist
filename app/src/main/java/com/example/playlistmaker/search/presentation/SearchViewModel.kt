@@ -6,10 +6,6 @@ import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.search.domain.ResponseState.Content
 import com.example.playlistmaker.search.domain.ResponseState.Error
@@ -31,7 +27,6 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     private val searchViewState = MutableLiveData<SearchViewState>()
 
     fun searchViewStateLiveData(): LiveData<SearchViewState> = searchViewState
-
 
     init {
         trackList.addAll(searchInteractor.getTracksFromLocalStorage(HISTORY_KEY))
@@ -119,11 +114,5 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     companion object {
         private val SEARCH_REQUEST_TOKEN = Any()
         private const val HISTORY_KEY = "history_tracks"
-        fun factory(): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    SearchViewModel(searchInteractor = Creator.provideTracksInteractor())
-                }
-            }
     }
 }

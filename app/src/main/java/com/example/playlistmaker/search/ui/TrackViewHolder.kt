@@ -39,7 +39,9 @@ class TrackViewHolder(parent: ViewGroup,
             .transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.size_2dp)))
             .into(pictureTrack)
 
-        itemView.debounceClickListener(debouncer, { action.invoke(track) })
+        itemView.setOnClickListener {
+            println("qqq ${track.trackId}")
+            action.invoke(track) }
     }
 
     private fun formatTrackTime(trackTimeMillis: Int): String {
