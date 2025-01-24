@@ -10,6 +10,7 @@
 
     <color name="edittext_text_search_root">#1A1B22</color>
     <color name="search_root_text">#FFFFFF</color>
+    <color name="text_media_fragments">#FFFFFF</color>
     <color name="text_for_rounded_btn">#1A1B22</color>
     <color name="text_for_tabs">#FFFFFF</color>
     <color name="color_for_tab_line">#FFFFFF</color>

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".media.FavoriteTracksFragment">
+    tools:context=".media.ui.FavoriteTracksFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -21,10 +21,11 @@
             android:src="@drawable/ic_placeholder_nothing_found" />
 
         <TextView
-            style="@style/text_placeholder_for_search"
+            style="@style/text_for_media_fragments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/size_16dp"
+            android:layout_marginTop="@dimen/size_19sp"
+            android:layout_weight="500"
             android:text="@string/empty_library" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>

@@ -63,15 +63,27 @@ class SearchActivity : AppCompatActivity() {
 
         viewModel.searchViewStateLiveData().observe(this) { state ->
             when (state) {
-                is SearchViewState.Default -> showEmptyList()
-                is SearchViewState.Loading -> showLoadingState()
+                is SearchViewState.Default -> {
+                    showEmptyList()
+                    println("qqq $state default")
+                }
+
+                is SearchViewState.Loading -> {
+                    showLoadingState()
+                    println("qqq $state default")
+                }
+
                 is SearchViewState.HistoryContent -> {
                     if (state.list.isEmpty()) showEmptyList()
                     else showHistoryTracks(list = state.list)
+                    println("qqq $state history")
                 }
+
                 is SearchViewState.SearchContent -> {
+                    println("qqq $state search content")
                     showNewTracks(list = state.list)
                 }
+
                 is SearchViewState.NoData -> showNoDataState()
                 is SearchViewState.Error -> showErrorState()
                 is SearchViewState.ClearBtn -> updateClearBtState(state.state)

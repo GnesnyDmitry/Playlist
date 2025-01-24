@@ -1,27 +1,25 @@
-package com.example.playlistmaker.media
+package com.example.playlistmaker.media.ui
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
 
-class FavoriteTracksFragment : Fragment() {
-
-
+class PlaylistsFragment : Fragment() {
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_favorite_tracks, container, false)
+        return inflater.inflate(R.layout.fragment_playlists, container, false)
     }
 
     companion object {
 
         @JvmStatic
-        fun newInstance() = FavoriteTracksFragment()
+        fun newInstance() = PlaylistsFragment()
     }
 }

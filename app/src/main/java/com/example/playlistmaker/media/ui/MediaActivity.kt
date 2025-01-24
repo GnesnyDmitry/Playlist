@@ -1,17 +1,18 @@
-package com.example.playlistmaker.media
+package com.example.playlistmaker.media.ui
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
 import com.example.playlistmaker.databinding.ActivityMediaBinding
+import com.example.playlistmaker.media.presentation.MediaViewModel
+import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MediaActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMediaBinding.inflate(layoutInflater) }
+    private val viewModel by viewModel<MediaViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -26,6 +27,16 @@ class MediaActivity : AppCompatActivity() {
                 else -> null
             }
         }.attach()
+
+        viewModel.currentTab.observe(this) { tab ->
+            binding.viewPager2.currentItem = tab
+        }
+
+        binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                viewModel.setCurrentTab(position)
+            }
+        })
 
         binding.toolbar.setNavigationOnClickListener { finish() }
     }

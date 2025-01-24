@@ -2,6 +2,7 @@ package com.example.playlistmaker
 
 import android.app.Application
 import android.content.Context
+import com.example.playlistmaker.di.mediaModule
 import com.example.playlistmaker.di.playerModule
 import com.example.playlistmaker.di.searchModule
 import com.example.playlistmaker.di.settingModule
@@ -24,7 +25,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(searchModule, playerModule, settingModule)
+            modules(searchModule, playerModule, settingModule, mediaModule)
         }
 
         instance = this
