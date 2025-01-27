@@ -30,7 +30,6 @@
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.tabs.TabLayout
-        app:tabIndicator="@drawable/custom_tab_indicator"
         app:tabTextAppearance="@style/TabTextStyle"
         android:id="@+id/tablayout"
         android:layout_width="match_parent"

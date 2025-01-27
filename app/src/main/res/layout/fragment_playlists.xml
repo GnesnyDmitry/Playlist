@@ -24,8 +24,10 @@
         android:id="@+id/placeholder_nothing_found"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/size_106dp"
         android:orientation="vertical"
+
         tools:visibility="visible">
 
         <androidx.appcompat.widget.AppCompatImageView

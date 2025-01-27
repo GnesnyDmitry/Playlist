@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.playlistmaker.R
+import com.example.playlistmaker.player.presentation.PlayerViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
+
+    private val viewModel by viewModel<PlayerViewModel>()
 
 
     override fun onCreateView(
