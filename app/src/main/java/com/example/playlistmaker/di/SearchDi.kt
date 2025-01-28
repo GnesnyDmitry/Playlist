@@ -85,5 +85,4 @@ val searchModule = module {
         App.instance
     }
 
-
 }

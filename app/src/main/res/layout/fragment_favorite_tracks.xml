@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".media.ui.FavoriteTracksFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder_nothing_found"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/size_106dp"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_placeholder_nothing_found" />
+
+        <TextView
+            style="@style/text_for_media_fragments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size_19sp"
+            android:layout_weight="500"
+            android:text="@string/empty_library" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</FrameLayout>

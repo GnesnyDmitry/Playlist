@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".media.ui.PlaylistsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/size_24dp"
+        android:background="@drawable/ripple_for_rounded_btn"
+        android:fontFamily="@font/ys_display_medium"
+        android:padding="@dimen/size_10dp"
+        android:text="@string/new_playlist"
+        android:textAllCaps="false"
+        android:textColor="@color/text_for_rounded_btn"
+        android:textSize="@dimen/size_14sp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/placeholder_nothing_found"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/size_106dp"
+        android:orientation="vertical"
+
+        tools:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_placeholder_nothing_found" />
+
+        <TextView
+            style="@style/text_for_media_fragments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size_10dp"
+            android:layout_weight="500"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/empty_playlist"
+            android:textSize="@dimen/size_19sp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</FrameLayout>

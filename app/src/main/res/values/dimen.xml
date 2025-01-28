@@ -19,6 +19,7 @@
     <dimen name="size_54dp">54dp</dimen>
     <dimen name="size_60dp">60dp</dimen>
     <dimen name="size_102dp">102dp</dimen>
+    <dimen name="size_106dp">106dp</dimen>
 
     <dimen name="size_8sp">8sp</dimen>
     <dimen name="size_11sp">11sp</dimen>

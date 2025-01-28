@@ -19,6 +19,7 @@ class RetrofitNetworkClient(
         if (!isConnected()) return Response().apply { resultCode = -1 }
 
         if (dto is TrackSearchRequest) {
+            println("qqq $imdbService $context")
             val resp = imdbService
                 .search(dto.expression)
                 .execute()
