@@ -1,35 +1,42 @@
 package com.example.playlistmaker.setting.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.databinding.FragmentSettingBinding
 import com.example.playlistmaker.setting.presentation.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class SettingsActivity : AppCompatActivity() {
+class SettingFrag : Fragment() {
 
-    private val binding by lazy { ActivitySettingsBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentSettingBinding
     private val viewModel by viewModel<SettingsViewModel>()
-    private val router = SettingsRouter(this)
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(binding.root)
+    }
 
-        viewModel.themeStateLiveData().observe(this) {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSettingBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.themeStateLiveData().observe(viewLifecycleOwner) {
             binding.themeSwitcher.isChecked = it
         }
-
-       binding.settingsRootToolbar.setNavigationOnClickListener {
-            router.goBack()
-       }
 
         binding.btnShareApp.setOnClickListener {
             shareApp()
@@ -43,9 +50,9 @@ class SettingsActivity : AppCompatActivity() {
             thermsUse()
         }
 
-       binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
-           viewModel.changeTheme(isChecked)
-       }
+        binding.themeSwitcher.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.changeTheme(isChecked)
+        }
     }
 
     private fun shareApp() {

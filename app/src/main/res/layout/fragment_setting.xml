@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settings_root"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/setting_frag"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/settings_root_view"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".setting.ui.SettingFrag"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/settings_root_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/size_24dp"
-        app:navigationIcon="@drawable/ic_back">
+        android:layout_marginBottom="@dimen/size_24dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -68,4 +68,5 @@
         style="@style/ButtonForSettings"
         android:drawableEnd="@drawable/ic_go_to"
         android:text="@string/therms_use" />
-</LinearLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

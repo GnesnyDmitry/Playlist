@@ -2,33 +2,48 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Context
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.search.ui.model.ClearBtnState
 import com.example.playlistmaker.search.ui.model.SearchViewState
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFrag : Fragment() {
 
-    private val binding by lazy { ActivitySearchBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentSearchBinding
     private val viewModel by viewModel<SearchViewModel>()
     private val trackAdapter = TrackAdapter()
-    private val router = SearchRouter(this)
+    private val router by lazy { SearchRouter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = trackAdapter
         }
 
@@ -37,9 +52,6 @@ class SearchActivity : AppCompatActivity() {
             router.openPlayerActivity(track)
             viewModel.onClickedTrack(track)
         }
-
-        binding.searchRootToolbar.setNavigationOnClickListener { finish() }
-
 
         binding.edittextSearchRoot.doOnTextChanged { text, _, _, _ ->
             viewModel.onTextChange("$text")
@@ -61,7 +73,7 @@ class SearchActivity : AppCompatActivity() {
             viewModel.onClickClearEditText()
         }
 
-        viewModel.searchViewStateLiveData().observe(this) { state ->
+        viewModel.searchViewStateLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SearchViewState.Default -> {
                     showEmptyList()
@@ -89,18 +101,13 @@ class SearchActivity : AppCompatActivity() {
                 is SearchViewState.ClearBtn -> updateClearBtState(state.state)
             }
         }
-
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.onStop("${binding.edittextSearchRoot.text}")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         trackAdapter.action = null
     }
+
 
     private fun updateClearBtState(state: Enum<ClearBtnState>) {
         if (state == ClearBtnState.TEXT) {
@@ -169,11 +176,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showKeyboard(show: Boolean) {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (show)
-            imm.showSoftInput(binding.edittextSearchRoot, 0)
-        else
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (show) {
+            imm.showSoftInput(binding.edittextSearchRoot, InputMethodManager.SHOW_IMPLICIT)
+        } else {
             imm.hideSoftInputFromWindow(binding.edittextSearchRoot.windowToken, 0)
+        }
     }
 
     private fun clearBtnIsVisible(show: Boolean) {
@@ -188,4 +196,5 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val TRACK_KEY = "track"
     }
+
 }

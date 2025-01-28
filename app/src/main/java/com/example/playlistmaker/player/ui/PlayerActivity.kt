@@ -8,13 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.search.ui.SearchActivity
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
-import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.example.playlistmaker.player.ui.model.PlayButtonState
 import com.example.playlistmaker.player.ui.model.PlayerViewState
+import com.example.playlistmaker.search.ui.SearchFrag
 import com.example.playlistmaker.tools.getTimeFormat
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -102,10 +101,10 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun getTrack(): Track {
         val track: Track? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(SearchActivity.TRACK_KEY, Track::class.java)
+            intent.getParcelableExtra(SearchFrag.TRACK_KEY, Track::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra(SearchActivity.TRACK_KEY)
+            intent.getParcelableExtra(SearchFrag.TRACK_KEY)
         }
         return requireNotNull(track)
     }
