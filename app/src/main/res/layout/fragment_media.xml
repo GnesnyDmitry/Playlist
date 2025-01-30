@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/media_frag"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/media_frag"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/yp_interface"
     tools:context=".media.ui.MediaFrag">
 
     <androidx.appcompat.widget.Toolbar
@@ -28,16 +29,17 @@
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.tabs.TabLayout
-        app:tabTextAppearance="@style/TabTextStyle"
         android:id="@+id/tablayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/yp_interface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:tabTextColor="@color/text_for_tabs"
         app:tabIndicatorColor="@color/color_for_tab_line"
-        app:tabIndicatorFullWidth="false">
+        app:tabIndicatorFullWidth="false"
+        app:tabTextAppearance="@style/TabTextStyle"
+        app:tabTextColor="@color/text_for_tabs">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/yp_interface"
     tools:context=".media.ui.FavoriteTracksFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -10,8 +11,8 @@
         android:id="@+id/placeholder_nothing_found"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_106dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/size_106dp"
         android:orientation="vertical"
         tools:visibility="visible">
 
