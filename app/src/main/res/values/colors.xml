@@ -7,8 +7,10 @@
     <color name="blue_light">#9FBBF3</color>
     <color name="gray">#AEAFB4</color>
     <color name="gray_light">#E6E8EB</color>
+    <color name="yp_interface">#FFFFFF</color>
 
-
+    <color name="nav_icon_color">#1A1B22</color>
+    <color name="separator_nav_bar">#E6E8EB</color>
 
     <color name="settings_root_ic_back">#FF000000</color>
     <color name="settings_root_view">#FFFFFFFF</color>
@@ -41,4 +43,5 @@
     <color name="text_for_player_right">#1A1B22</color>
     <color name="audio_player_root">#FFFFFF</color>
     <color name="btn_play_and_pause">#1A1B22</color>
+
 </resources>

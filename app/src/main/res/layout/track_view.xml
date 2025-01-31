@@ -4,11 +4,12 @@
     android:id="@+id/item_track"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="?attr/colorSecondary"
+    android:backgroundTint="@color/yp_interface"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?actionBarItemBackground"
-    tools:src="@drawable/placeholder">
+    tools:src="@drawable/placeholder"
+    android:background="@color/yp_interface">
 
     <ImageView
         android:id="@+id/picture_track"

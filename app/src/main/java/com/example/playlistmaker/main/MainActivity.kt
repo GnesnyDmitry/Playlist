@@ -1,48 +1,25 @@
 package com.example.playlistmaker.main
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.media.ui.MediaActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
-import com.example.playlistmaker.search.ui.SearchActivity
-import com.example.playlistmaker.setting.ui.SettingsActivity
+import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_root)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
-        val btnSearch = findViewById<Button>(R.id.activity_root_btn_search)
-        val btnMedia = findViewById<Button>(R.id.activity_root_btn_media)
-        val btnSettings = findViewById<Button>(R.id.activity_root_btn_settings)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.container_view) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        btnSearch.setOnClickListener {
-            val goSearchActivity = Intent(this, SearchActivity::class.java)
-            goSearchActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(goSearchActivity)
-        }
-
-        btnMedia.setOnClickListener {
-            val goMediaActivity = Intent(this, MediaActivity::class.java)
-            goMediaActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(goMediaActivity)
-        }
-
-        btnSettings.setOnClickListener {
-            val goSettingsActivity = Intent(this, SettingsActivity::class.java)
-            goSettingsActivity.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(goSettingsActivity)
-        }
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView.setupWithNavController(navController)
     }
 }

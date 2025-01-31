@@ -1,21 +1,36 @@
 package com.example.playlistmaker.media.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityMediaBinding
+import com.example.playlistmaker.databinding.FragmentMediaBinding
 import com.example.playlistmaker.media.presentation.MediaViewModel
-import com.example.playlistmaker.player.presentation.PlayerViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MediaActivity : AppCompatActivity() {
-    private val binding by lazy { ActivityMediaBinding.inflate(layoutInflater) }
+class MediaFrag : Fragment() {
+
+    private lateinit var binding: FragmentMediaBinding
     private val viewModel by viewModel<MediaViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentMediaBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val adapter = MediaPagerAdapter(this)
         binding.viewPager2.adapter = adapter
@@ -28,7 +43,7 @@ class MediaActivity : AppCompatActivity() {
             }
         }.attach()
 
-        viewModel.currentTab.observe(this) { tab ->
+        viewModel.currentTab.observe(viewLifecycleOwner) { tab ->
             binding.viewPager2.currentItem = tab
         }
 
@@ -37,7 +52,5 @@ class MediaActivity : AppCompatActivity() {
                 viewModel.setCurrentTab(position)
             }
         })
-
-        binding.toolbar.setNavigationOnClickListener { finish() }
     }
 }

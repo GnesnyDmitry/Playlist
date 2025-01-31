@@ -2,18 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/search_root"
+    android:id="@+id/search_frag"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/search_root"
-    tools:context=".search.ui.SearchActivity">
+    android:background="@color/yp_interface"
+    tools:context=".search.ui.SearchFrag">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/search_root_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_back">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -44,6 +43,8 @@
             android:background="@drawable/shape_edittext"
             android:drawableStart="@drawable/ic_search_14"
             android:drawablePadding="@dimen/size_10dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="@string/search"
             android:imeOptions="actionDone"
             android:inputType="textCapSentences|textAutoCorrect"
@@ -53,8 +54,6 @@
             android:textColor="@color/black"
             android:textColorHint="@color/edittext_text_search_root"
             android:textCursorDrawable="@drawable/cursor_edittext"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:textSize="@dimen/size_16sp" />
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -64,7 +63,7 @@
             android:layout_gravity="end|center"
             android:background="@drawable/shape_ic_close"
             android:src="@drawable/ic_clear_text"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </FrameLayout>
 
@@ -74,11 +73,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@+id/edittext_container"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_container"
+        tools:visibility="visible">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
@@ -113,10 +112,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/edittext_container"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_container"
         app:layout_constraintVertical_bias="0.3">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -181,16 +180,17 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:visibility="visible" />
 
-    <ProgressBar android:id="@+id/progressBar"
-        app:layout_constraintTop_toBottomOf="@id/edittext_container"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/search_root"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_gravity="center"
         android:indeterminateTint="@color/progress_bar_color"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/search_frag"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edittext_container" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
