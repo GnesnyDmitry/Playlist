@@ -54,8 +54,8 @@ dependencies {
     implementation(libs.fragments)
     //ViewPager2
     implementation(libs.viewpager2)
-
-
+    //Coroutines
+    implementation(libs.coroutines.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

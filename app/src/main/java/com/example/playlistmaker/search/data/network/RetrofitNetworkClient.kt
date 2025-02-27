@@ -14,28 +14,23 @@ class RetrofitNetworkClient(
     private val context: Context,
 ) : NetworkClient {
 
-    override fun doRequest(dto: Any): Response {
+    override suspend fun doRequest(dto: Any): Response {
 
         if (!isConnected()) return Response().apply { resultCode = -1 }
 
-        if (dto is TrackSearchRequest) {
-            println("qqq $imdbService $context")
-            val resp = imdbService
-                .search(dto.expression)
-                .execute()
+        if (dto !is TrackSearchRequest) return Response().apply { resultCode = 400 }
 
-            val body = resp.body() ?: Response()
-
-            return body.apply { resultCode = resp.code() }
-        } else {
-            return Response().apply { resultCode = 400 }
-        }
+        val response = imdbService.search(dto.expression)
+        return response?.body()?.apply { resultCode = response.code() }
+            ?: Response().apply { resultCode = response?.code() ?: 400 }
     }
 
     private fun isConnected(): Boolean {
         val connectivityManager = context.getSystemService(
-            Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
 
         if (capabilities != null) {
             when {
