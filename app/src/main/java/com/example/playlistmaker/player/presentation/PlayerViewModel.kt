@@ -58,8 +58,8 @@ class PlayerViewModel(private val interactor: PlayerInteractor) : ViewModel() {
         interactor.startTrack()
         timerJob = viewModelScope.launch {
             while (interactor.getState() == MediaPlayerState.PLAYING) {
-                delay(DELAY300L)
                 playerViewState.postValue(PlayerViewState.TrackTime(interactor.getTime()))
+                delay(DELAY300L)
             }
         }
     }
