@@ -3,12 +3,15 @@ package com.example.playlistmaker.search.domain
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.search.domain.api.TrackInteractor
 import com.example.playlistmaker.search.domain.api.TrackRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import java.util.concurrent.Executors
 
 class TrackInteractorImpl(private val repository: TrackRepository) : TrackInteractor {
 
-    override fun searchTracks(expression: String, action: (ResponseState) -> Unit) {
-        action.invoke(repository.searchTrack(expression))
+    override fun searchTracks(expression: String): Flow<ResponseState> {
+        return (repository.searchTrack(expression))
     }
 
     override fun getTracksFromLocalStorage(key: String): MutableList<Track> {
