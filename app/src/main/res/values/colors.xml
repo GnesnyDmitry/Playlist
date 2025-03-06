@@ -44,4 +44,6 @@
     <color name="audio_player_root">#FFFFFF</color>
     <color name="btn_play_and_pause">#1A1B22</color>
 
+    <color name="btn_like">#AEAFB4</color>
+
 </resources>
