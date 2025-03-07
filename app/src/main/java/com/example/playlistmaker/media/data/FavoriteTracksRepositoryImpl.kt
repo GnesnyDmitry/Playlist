@@ -17,7 +17,7 @@ class FavoriteTracksRepositoryImpl(
 
     override val trackFlow = tracksDataBase.trackDao()
         .getFavoriteTracks()
-        .map { list -> list.map { converter.trackToDomain(it) } }
+        .map { list -> list.asReversed().map { converter.trackToDomain(it) } }
         .stateIn(
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
             started = SharingStarted.Eagerly,
