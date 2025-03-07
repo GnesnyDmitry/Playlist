@@ -1,6 +1,7 @@
 package com.example.playlistmaker.di
 
 import android.media.MediaPlayer
+import com.example.playlistmaker.db.Converter
 import com.example.playlistmaker.player.data.PlayerRepositoryImpl
 import com.example.playlistmaker.player.domain.PlayerInteractorImpl
 import com.example.playlistmaker.player.domain.api.PlayerInteractor
@@ -19,13 +20,15 @@ val playerModule = module {
 
     single<PlayerInteractor> {
         PlayerInteractorImpl(
-            medialPlayer = get()
+            playerRepository = get(),
         )
     }
 
     factory<PlayerRepository> {
         PlayerRepositoryImpl(
-            mediaPlayer = get()
+            mediaPlayer = get(),
+            tracksDataBase = get(),
+            converter = Converter()
         )
     }
 

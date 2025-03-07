@@ -2,11 +2,12 @@ package com.example.playlistmaker.search.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.tools.TRACK_KEY
 
-class SearchRouter(private val frag: SearchFrag) {
+class SearchRouter(private val frag: Fragment) {
 
     fun openPlayerActivity(track: Track) {
         val context = frag.requireContext()

@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.TrackAdapter
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.search.ui.model.ClearBtnState
 import com.example.playlistmaker.search.ui.model.SearchViewState
