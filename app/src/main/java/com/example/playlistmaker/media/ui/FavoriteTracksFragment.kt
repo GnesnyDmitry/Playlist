@@ -25,8 +25,7 @@ class FavoriteTracksFragment : Fragment() {
 
     private val viewModel by viewModel<FavoriteTracksViewModel>()
     private lateinit var binding: FragmentFavoriteTracksBinding
-    private val debouncer by lazy { Debouncer(viewLifecycleOwner.lifecycleScope) }
-    private val trackAdapter by lazy { TrackAdapter(debouncer) }
+    private val trackAdapter by lazy { TrackAdapter() }
     private val router by lazy { SearchRouter(this) }
 
     override fun onCreateView(
@@ -91,8 +90,8 @@ class FavoriteTracksFragment : Fragment() {
     private fun showFavoriteTracks(list: List<Track>) {
         binding.placeholderNothingFound.isVisible = false
         binding.recyclerView.isVisible = true
-        trackAdapter.trackList.clear()
-        trackAdapter.trackList.addAll(list)
+        trackAdapter.items.clear()
+        trackAdapter.items.addAll(list)
         trackAdapter.notifyDataSetChanged()
     }
     companion object {

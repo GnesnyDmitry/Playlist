@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/edittext_create_playlist" />
+
+    <corners android:radius="4dp" />
+
+    <stroke android:color="@color/gray"
+        android:width="1dp" />
+
+    <padding
+        android:bottom="@dimen/size_20dp"
+        android:left="8dp"
+        android:right="@dimen/size_8dp"
+        android:top="@dimen/size_20dp"/>
+</shape>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:padding="@dimen/size_4dp"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_140dp"
+        app:cardCornerRadius="@dimen/size_8dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/playlist_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/yp_interface"
+            android:src="@drawable/placeholder"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:fontFamily="@font/ys_display_medium"
+        android:id="@+id/playlist_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Best Song"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/size_14sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:fontFamily="@font/ys_display_medium"
+        android:id="@+id/track_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/size_14sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textStyle="bold"
+        tools:text="1 трек"/>
+</LinearLayout>

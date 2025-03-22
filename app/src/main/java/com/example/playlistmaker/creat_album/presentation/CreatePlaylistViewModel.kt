@@ -1,0 +1,48 @@
+package com.example.playlistmaker.creat_album.presentation
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.creat_album.ui.model.CreatePlaylistViewState
+import com.example.playlistmaker.domain.interactor.PlaylistDbInteractor
+import com.example.playlistmaker.domain.models.Playlist
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class CreatePlaylistViewModel(
+    private val interactor: PlaylistDbInteractor
+) : ViewModel() {
+
+    private val uiState = MutableStateFlow<CreatePlaylistViewState>(CreatePlaylistViewState.Default)
+    val uiStateFlow: StateFlow<CreatePlaylistViewState> = uiState.asStateFlow()
+
+    private var playlist = Playlist(
+        id = 0,
+        name = "",
+        description = "",
+        uri = "",
+        trackList = emptyList(),
+        trackCount = 0
+    )
+
+    fun createPlaylist() {
+        viewModelScope.launch(Dispatchers.IO) {
+            interactor.createPlaylist(playlist)
+            uiState.emit(CreatePlaylistViewState.SavePlaylist(name = playlist.name))
+        }
+    }
+
+    fun doOnDescriptionTextChange(text: String) {
+        playlist = playlist.copy(description = text)
+    }
+
+    fun doOnNameTextChange(text: String) {
+        playlist = playlist.copy(name = text)
+    }
+
+    fun doOnPhotoChange(uri: String) {
+        playlist = playlist.copy(uri = uri)
+    }
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/create_album_frag"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/search_root">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="@string/new_playlist" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/size_16dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/size_16dp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/add_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/size_8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/dashed_border_for_album"
+        app:layout_constraintBottom_toTopOf="@id/edit_text_name_playlist"
+        app:layout_constraintDimensionRatio="w,4:3"
+        app:layout_constraintEnd_toEndOf="@id/right_guideline_24"
+        app:layout_constraintStart_toStartOf="@id/left_guideline_24"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/edit_text_name_playlist"
+        style="@style/CustomTextInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/size_24dp"
+        android:hint="@string/name_for_album"
+        app:layout_constraintEnd_toEndOf="@id/right_guideline_24"
+        app:layout_constraintStart_toStartOf="@id/left_guideline_24"
+        app:layout_constraintTop_toBottomOf="@id/add_image">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:inputType="textCapSentences"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/edit_text_description_playlist"
+        style="@style/CustomTextInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/size_16dp"
+        android:hint="@string/description_for_album"
+        app:layout_constraintEnd_toEndOf="@id/right_guideline_24"
+        app:layout_constraintStart_toStartOf="@id/left_guideline_24"
+        app:layout_constraintTop_toBottomOf="@id/edit_text_name_playlist">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:inputType="textCapSentences"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/create_playlist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/size_16dp"
+        android:background="@drawable/btn_active_inactive"
+        android:enabled="false"
+        android:text="@string/create"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/size_16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/right_guideline_24"
+        app:layout_constraintStart_toStartOf="@id/left_guideline_24" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
