@@ -36,6 +36,7 @@ class PlayerActivity : AppCompatActivity() {
         val track = getTrack()
 
         track.let {
+            viewModel.getFavoriteState(track.trackId)
             track.previewUrl?.let { url -> viewModel.preparePlayer(url) }
             binding.apply {
 
@@ -55,6 +56,16 @@ class PlayerActivity : AppCompatActivity() {
                 txtCountryRight.text = it.country
             }
         }
+
+        viewModel.btnLikeLiveData().observe(this) { state ->
+            if (state) {
+                binding.btnLike.setImageResource(R.drawable.player_like)
+            } else {
+                binding.btnLike.setImageResource(R.drawable.player_dislike)
+            }
+        }
+
+        binding.btnLike.setOnClickListener { viewModel.onClickBtnLike(track) }
 
         btnPlay.setOnClickListener {
             viewModel.onClickedBtnPlay()
