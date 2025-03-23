@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -28,6 +29,7 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
 
     private lateinit var binding: FragmentCreatePlaylistBinding
     private val viewModel by viewModel<CreatePlaylistViewModel>()
+    private var dialogGoBack: AlertDialog? = null
 
     val pickMediaForPlaylist =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -52,28 +54,19 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        prepareDialogGoBack()
+
         binding.toolbar.setNavigationOnClickListener {
-            if (hasUnsavedChanges()) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Завершить создание плейлиста?")
-                    .setMessage("Все несохраненные данные будут потярены")
-                    .setNegativeButton("Отмена") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .setPositiveButton("Завершить") { _, _ ->
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
-                    }
-                    .show()
-            } else {
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
+            viewModel.onGoBack()
         }
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             viewModel.uiStateFlow.collect { state ->
                 when (state) {
                     is CreatePlaylistViewState.SavePlaylist -> { savePlaylist(state.name) }
-                    CreatePlaylistViewState.Default -> {  }
+                    is CreatePlaylistViewState.Default -> {  }
+                    is CreatePlaylistViewState.GoBack -> { goBack() }
+                    is CreatePlaylistViewState.ShowDialog -> { dialogGoBack?.show() }
                 }
             }
         }
@@ -117,10 +110,15 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         }
     }
 
-    private fun hasUnsavedChanges(): Boolean {
-        return !binding.name.text.isNullOrBlank() ||
-                !binding.description.text.isNullOrBlank() ||
-                binding.addImage.drawable != null
+    private fun prepareDialogGoBack() {
+        dialogGoBack = AlertDialog.Builder(requireContext())
+            .setTitle("Завершить создание плейлиста?")
+            .setMessage("Все несохраненные данные будут потярены")
+            .setNegativeButton("Отмена") { _, _, -> viewModel.hideDialogGoBack() }
+            .setPositiveButton("Завершить") { _,_ -> findNavController().navigateUp() }
+            .create()
+        dialogGoBack?.setCanceledOnTouchOutside(false)
+        dialogGoBack?.setCancelable(false)
     }
 
     companion object { fun newInstance() = CreatePlaylistFrag() }

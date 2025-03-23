@@ -45,4 +45,20 @@ class CreatePlaylistViewModel(
     fun doOnPhotoChange(uri: String) {
         playlist = playlist.copy(uri = uri)
     }
+
+    fun hideDialogGoBack() {
+        viewModelScope.launch {
+            uiState.emit(CreatePlaylistViewState.Default)
+        }
+    }
+
+    fun onGoBack() {
+        viewModelScope.launch {
+            if (playlist.uri.isNotEmpty() || playlist.name.isNotEmpty() || playlist.description.isNotEmpty()) {
+                uiState.emit(CreatePlaylistViewState.ShowDialog)
+            } else {
+                uiState.emit(CreatePlaylistViewState.GoBack)
+            }
+        }
+    }
 }

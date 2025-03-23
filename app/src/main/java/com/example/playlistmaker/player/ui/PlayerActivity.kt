@@ -2,7 +2,6 @@ package com.example.playlistmaker.player.ui
 
 import android.os.Build
 import android.os.Bundle
-import android.os.Message
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
@@ -13,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.BottomSheetPlaylistAdapter
-import com.example.playlistmaker.PlaylistAdapter
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
@@ -27,7 +25,6 @@ import com.example.playlistmaker.search.ui.SearchFrag
 import com.example.playlistmaker.tools.getTimeFormat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -97,6 +94,14 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.onClickedBtnPlay()
         }
 
+        binding.bottomSheet.newAlbum.setOnClickListener {
+            hideBottomSheet()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.player_containerView, CreatePlaylistFrag.newInstance())
+                .addToBackStack(null)
+                .commit()
+        }
+
         viewModel.playBtnStateLiveData().observe(this) { state ->
             when (state) {
                 is PlayerViewState.PlayBtn -> {
@@ -125,10 +130,19 @@ class PlayerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.bottomSheetStateFlow.collect { state ->
                 when (state) {
-                    is BottomSheetState.Empty -> showBottomSheet(emptyList())
-                    is BottomSheetState.Playlists -> showBottomSheet(state.playlists)
-                    is BottomSheetState.TrackExistInPlaylist -> hideBottomSheet("Трек уже добавлен в плейлист ${state.playlistName}")
-                    is BottomSheetState.AddNewTrackInPlaylist -> hideBottomSheet("Добавлено в плейлист ${state.playlistName}")
+                    is BottomSheetState.Empty -> {
+                        showPlaylists(emptyList())
+                    }
+                    is BottomSheetState.Playlists -> {
+                        showPlaylists(state.playlists)
+                    }
+                    is BottomSheetState.TrackExistInPlaylist -> {
+                        showSnackbar("Трек уже добавлен в плейлист ${state.playlistName}")
+                    }
+                    is BottomSheetState.AddNewTrackInPlaylist -> {
+                        showSnackbar("Добавлено в плейлист ${state.playlistName}")
+                        hideBottomSheet()
+                    }
                 }
             }
         }
@@ -139,29 +153,24 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.stopTrack()
     }
 
-    private fun hideBottomSheet(message: String) {
+    private fun showSnackbar(message: String) {
         Snackbar
             .make(this, binding.root, message, Snackbar.LENGTH_SHORT)
             .setBackgroundTint(ContextCompat.getColor(this, R.color.blue))
             .setTextColor(ContextCompat.getColor(this, R.color.white))
             .show()
+    }
+
+    private fun showPlaylists(playlists: List<Playlist>) {
+        playlistAdapter.items = playlists
+        binding.bottomSheet.recycler.adapter = playlistAdapter
+        playlistAdapter.notifyDataSetChanged()
+    }
+    
+    private fun hideBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
-    private fun showBottomSheet(playlists: List<Playlist>) {
-        if (playlists.isNotEmpty()) {
-            binding.bottomSheet.newAlbum.setOnClickListener {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.player_containerView, CreatePlaylistFrag.newInstance())
-                    .addToBackStack(null)
-                    .commit()
-            }
-            playlistAdapter.items = playlists
-            binding.bottomSheet.recycler.adapter = playlistAdapter
-            playlistAdapter.notifyDataSetChanged()
-        }
-    }
 
     private fun initBottomSheet() {
         bottomSheetBehavior.apply {
