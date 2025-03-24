@@ -33,4 +33,8 @@
     <color name="text_for_player_right">#FFFFFF</color>
     <color name="audio_player_root">#1A1B22</color>
     <color name="btn_play_and_pause">#FFFFFF</color>
+    <color name="bottom_sheet_color">#1A1B22</color>
+    <color name="text_for_bottom_sheet_recycler">#FFFFFF</color>
+
+    <color name="edittext_create_playlist">#1A1B22</color>
 </resources>

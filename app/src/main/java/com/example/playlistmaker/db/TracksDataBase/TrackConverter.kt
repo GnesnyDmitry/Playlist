@@ -1,8 +1,8 @@
-package com.example.playlistmaker.db
+package com.example.playlistmaker.db.TracksDataBase
 
 import com.example.playlistmaker.domain.models.Track
 
-class Converter {
+class TrackConverter {
 
     fun trackToEntity(track: Track): TrackEntity {
         return TrackEntity(

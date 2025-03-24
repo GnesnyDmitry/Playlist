@@ -24,8 +24,7 @@ class SearchFrag : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
     private val viewModel by viewModel<SearchViewModel>()
-    private val  deboucer by lazy { Debouncer(viewLifecycleOwner.lifecycleScope) }
-    private val  trackAdapter by lazy { TrackAdapter(deboucer) }
+    private val  trackAdapter by lazy { TrackAdapter() }
     private val router by lazy { SearchRouter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,15 +128,15 @@ class SearchFrag : Fragment() {
     }
 
     private fun setItems(items: List<Track>) {
-        trackAdapter.trackList.clear()
-        trackAdapter.trackList.addAll(items)
+        trackAdapter.items.clear()
+        trackAdapter.items.addAll(items)
         trackAdapter.notifyDataSetChanged()
     }
 
     private fun showNoDataState() {
         binding.progressBar.isVisible = false
         binding.recyclerView.isVisible = true
-        trackAdapter.trackList.clear()
+        trackAdapter.items.clear()
         binding.placeholderNothingFound.isVisible = true
         binding.btnUpdate.isVisible = true
     }
@@ -145,7 +144,7 @@ class SearchFrag : Fragment() {
     private fun showErrorState() {
         binding.progressBar.isVisible = false
         binding.recyclerView.isVisible = true
-        trackAdapter.trackList.clear()
+        trackAdapter.items.clear()
         binding.placeholderNoConnection.isVisible = true
         binding.btnUpdate.isVisible = false
     }
@@ -158,7 +157,7 @@ class SearchFrag : Fragment() {
         binding.recyclerView.isVisible = false
         binding.headerSearchRoot.isVisible = false
         binding.btnClearHistory.isVisible = false
-        trackAdapter.trackList.clear()
+        trackAdapter.items.clear()
     }
 
     private fun showLoadingState() {
@@ -167,9 +166,9 @@ class SearchFrag : Fragment() {
     }
 
     private fun showHistoryTracks(list: List<Track>) {
-        trackAdapter.trackList.clear()
+        trackAdapter.items.clear()
         binding.progressBar.isVisible = false
-        trackAdapter.trackList.addAll(list)
+        trackAdapter.items.addAll(list)
         trackAdapter.notifyDataSetChanged()
         binding.recyclerView.isVisible = true
         binding.headerSearchRoot.isVisible = true

@@ -1,6 +1,6 @@
 package com.example.playlistmaker.di
 
-import com.example.playlistmaker.db.Converter
+import com.example.playlistmaker.db.TracksDataBase.TrackConverter
 import com.example.playlistmaker.media.data.FavoriteTracksRepositoryImpl
 import com.example.playlistmaker.media.domain.FavoriteTracksRepository
 import com.example.playlistmaker.media.domain.interactor.FavoriteTracksInteractor
@@ -16,7 +16,7 @@ val mediaModule = module {
     factory<FavoriteTracksRepository> {
         FavoriteTracksRepositoryImpl(
             tracksDataBase = get(),
-            converter = Converter()
+            trackConverter = TrackConverter()
         )
     }
 
@@ -28,10 +28,16 @@ val mediaModule = module {
 
     viewModel { MediaViewModel() }
 
-    viewModel { FavoriteTracksViewModel(
-        interactor = get()
-    ) }
+    viewModel {
+        FavoriteTracksViewModel(
+            interactor = get()
+        )
+    }
 
-    viewModel { PlaylistViewModel() }
+    viewModel {
+        PlaylistViewModel(
+            playlistDbInteractor = get()
+        )
+    }
 }
 
