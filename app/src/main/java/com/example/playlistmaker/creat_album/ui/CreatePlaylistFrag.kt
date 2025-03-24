@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -42,6 +43,12 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
             }
         }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.onGoBack()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,6 +62,11 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         super.onViewCreated(view, savedInstanceState)
 
         prepareDialogGoBack()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
 
         binding.toolbar.setNavigationOnClickListener {
             viewModel.onGoBack()
@@ -114,8 +126,8 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         dialogGoBack = AlertDialog.Builder(requireContext())
             .setTitle("Завершить создание плейлиста?")
             .setMessage("Все несохраненные данные будут потярены")
-            .setNegativeButton("Отмена") { _, _, -> viewModel.hideDialogGoBack() }
-            .setPositiveButton("Завершить") { _,_ -> findNavController().navigateUp() }
+            .setNegativeButton("Нет") { _, _, -> viewModel.hideDialogGoBack() }
+            .setPositiveButton("Да") { _,_ -> findNavController().navigateUp() }
             .create()
         dialogGoBack?.setCanceledOnTouchOutside(false)
         dialogGoBack?.setCancelable(false)
