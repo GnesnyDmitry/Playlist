@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.domain.models.Playlist
 
-class BottomSheetPlaylistAdapter(): RecyclerView.Adapter<BottomSheetPlaylistAdapter.BottomSheetPlaylistViewHolder>() {
+class playlistsBottomSheetAdapter(): RecyclerView.Adapter<playlistsBottomSheetAdapter.BottomSheetPlaylistViewHolder>() {
 
     var items: List<Playlist> = emptyList()
     var action: ((Playlist) -> Unit)? = null

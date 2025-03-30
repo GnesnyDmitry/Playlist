@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val interactor: PlaylistDbInteractor
 ) : ViewModel() {
 
-    private val uiState = MutableStateFlow<CreatePlaylistViewState>(CreatePlaylistViewState.Default)
+    protected val uiState = MutableStateFlow<CreatePlaylistViewState>(CreatePlaylistViewState.Default)
     val uiStateFlow: StateFlow<CreatePlaylistViewState> = uiState.asStateFlow()
 
-    private var playlist = Playlist(
+    protected var playlist = Playlist(
         id = 0,
         name = "",
         description = "",
@@ -27,7 +27,7 @@ class CreatePlaylistViewModel(
         trackCount = 0
     )
 
-    fun createPlaylist() {
+    open fun createPlaylist(data: Playlist?) {
         viewModelScope.launch(Dispatchers.IO) {
             interactor.createPlaylist(playlist)
             uiState.emit(CreatePlaylistViewState.SavePlaylist(name = playlist.name))
@@ -52,7 +52,7 @@ class CreatePlaylistViewModel(
         }
     }
 
-    fun onGoBack() {
+    open fun onGoBack() {
         viewModelScope.launch {
             if (playlist.uri.isNotEmpty() || playlist.name.isNotEmpty() || playlist.description.isNotEmpty()) {
                 uiState.emit(CreatePlaylistViewState.ShowDialog)

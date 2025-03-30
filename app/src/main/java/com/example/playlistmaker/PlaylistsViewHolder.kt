@@ -8,7 +8,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.tools.BaseViewHolder
 
-class PlaylistViewHolder(
+class PlaylistsViewHolder(
     parent: ViewGroup,
     private val action: ((Playlist) -> Unit)?
 ) : BaseViewHolder<Playlist>(parent, R.layout.playlist_item) {

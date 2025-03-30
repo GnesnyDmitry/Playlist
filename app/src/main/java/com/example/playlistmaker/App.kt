@@ -4,8 +4,10 @@ import android.app.Application
 import android.content.Context
 import com.example.playlistmaker.di.createPlaylistModule
 import com.example.playlistmaker.di.dataBaseModule
+import com.example.playlistmaker.di.editPlaylistModule
 import com.example.playlistmaker.di.mediaModule
 import com.example.playlistmaker.di.playerModule
+import com.example.playlistmaker.di.playlistModule
 import com.example.playlistmaker.di.searchModule
 import com.example.playlistmaker.di.settingModule
 import com.example.playlistmaker.setting.data.ThemeSwitcherImpl
@@ -27,7 +29,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(searchModule, playerModule, settingModule, mediaModule, dataBaseModule, createPlaylistModule)
+            modules(searchModule, playerModule, settingModule, mediaModule, dataBaseModule, createPlaylistModule, playlistModule, editPlaylistModule)
         }
 
         instance = this

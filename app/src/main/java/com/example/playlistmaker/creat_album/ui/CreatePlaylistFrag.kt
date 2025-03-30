@@ -1,5 +1,6 @@
 package com.example.playlistmaker.creat_album.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -19,17 +21,21 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.presentation.CreatePlaylistViewModel
 import com.example.playlistmaker.creat_album.ui.model.CreatePlaylistViewState
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.main.MainActivity
+import com.example.playlistmaker.tools.TRACK_KEY
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+open class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
 
-    private lateinit var binding: FragmentCreatePlaylistBinding
-    private val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected lateinit var binding: FragmentCreatePlaylistBinding
+    protected open val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected val playlist by lazy { arguments?.getParcelable(TRACK_KEY, Playlist::class.java) }
     private var dialogGoBack: AlertDialog? = null
 
     val pickMediaForPlaylist =
@@ -84,7 +90,7 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         }
 
         binding.createPlaylist.setOnClickListener {
-            viewModel.createPlaylist()
+            viewModel.createPlaylist(playlist)
         }
 
         binding.addImage.setOnClickListener {

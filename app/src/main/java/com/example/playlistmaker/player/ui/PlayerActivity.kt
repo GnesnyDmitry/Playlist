@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.BottomSheetPlaylistAdapter
+import com.example.playlistmaker.playlistsBottomSheetAdapter
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
@@ -34,7 +34,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var btnPlay: ImageView
     private val viewModel by viewModel<PlayerViewModel>()
     private val router = PlayerRouter(this)
-    private val playlistAdapter by lazy { BottomSheetPlaylistAdapter() }
+    private val playlistAdapter by lazy { playlistsBottomSheetAdapter() }
     private val bottomSheetContainer by lazy { findViewById<ConstraintLayout>(R.id.bottom_sheet) }
     private val bottomSheetBehavior by lazy { BottomSheetBehavior.from(bottomSheetContainer) }
 

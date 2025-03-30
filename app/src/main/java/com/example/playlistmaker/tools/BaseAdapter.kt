@@ -2,7 +2,7 @@ package com.example.playlistmaker.tools
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.PlaylistViewHolder
+import com.example.playlistmaker.PlaylistsViewHolder
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.TrackViewHolder
 import com.example.playlistmaker.domain.models.Playlist
@@ -26,7 +26,7 @@ abstract class BaseAdapter<T, VH: BaseViewHolder<T>>(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return when (viewType) {
             ItemViewType.Track().viewType -> TrackViewHolder(parent, action as? (Track) -> Unit) as VH
-            ItemViewType.Playlist().viewType -> PlaylistViewHolder(parent, action as? (Playlist) -> Unit) as VH
+            ItemViewType.Playlist().viewType -> PlaylistsViewHolder(parent, action as? (Playlist) -> Unit) as VH
             else -> throw IllegalArgumentException("Неизвестный view type")
         }
     }
