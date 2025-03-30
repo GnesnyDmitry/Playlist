@@ -98,4 +98,21 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
 
+    <style name="yandex_medium" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/size_22sp</item>
+    </style>
+
+    <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/outline</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="android:textColorHint">@color/text_for_bottom_sheet_recycler</item>
+        <item name="hintTextColor">@color/blue</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+    </style>
+
 </resources>

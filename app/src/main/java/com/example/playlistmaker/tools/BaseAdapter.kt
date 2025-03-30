@@ -2,33 +2,38 @@ package com.example.playlistmaker.tools
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.PlaylistViewHolder
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.TrackViewHolder
+import com.example.playlistmaker.domain.models.Playlist
 
 
-abstract class BaseAdapter<VH: BaseViewHolder>(
-    private val debouncer: Debouncer,
+abstract class BaseAdapter<T, VH: BaseViewHolder<T>>(
 ) : RecyclerView.Adapter<VH>() {
 
-    val trackList = ArrayList<Track>()
-    var action: ((Track) -> Unit)? = null
-
-    abstract fun createViewHolder(parent: ViewGroup): VH
+    var items = mutableListOf<T>()
+    var action: ((T) -> Unit)? = null
 
     override fun getItemViewType(position: Int): Int {
-        return ItemViewType.Track().viewType
+        val item = items[position]
+        return when (item) {
+            is Track -> ItemViewType.Track().viewType
+            is Playlist -> ItemViewType.Playlist().viewType
+            else -> throw IllegalArgumentException("Неизвестный элемент")
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return when (viewType) {
-            1 -> TrackViewHolder(parent, debouncer, action!!) as VH
+            ItemViewType.Track().viewType -> TrackViewHolder(parent, action as? (Track) -> Unit) as VH
+            ItemViewType.Playlist().viewType -> PlaylistViewHolder(parent, action as? (Playlist) -> Unit) as VH
             else -> throw IllegalArgumentException("Неизвестный view type")
         }
     }
 
-    override fun getItemCount(): Int = trackList.size
+    override fun getItemCount(): Int = items.size
 
 
     override fun onBindViewHolder(holder: VH, position: Int) =
-        holder.bindBase(trackList[position])
+        holder.bind(items[position])
 }
