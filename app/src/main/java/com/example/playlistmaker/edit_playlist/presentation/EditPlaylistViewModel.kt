@@ -22,12 +22,17 @@ class EditPlaylistViewModel(
 
     override fun createPlaylist(data: Playlist?) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (data!!.name.isNotEmpty()) {
-                interactor.updateAlbum(
-                    id = data.id,
-                    uri = if (playlist.uri == "") data.uri else playlist.uri,
+            if (data != null && data.name.isNotEmpty()) {
+                val updatePlaylist = data.copy(
                     name = playlist.name,
-                    description = playlist.description
+                    description = playlist.description,
+                    uri = if (playlist.uri.isEmpty()) data.uri else playlist.uri
+                )
+                interactor.updatePlaylist(
+                    id = data.id,
+                    uri = updatePlaylist.uri,
+                    name = updatePlaylist.name,
+                    description = updatePlaylist.description
                 )
                 uiState.emit(CreatePlaylistViewState.SavePlaylist(playlist.name))
             }

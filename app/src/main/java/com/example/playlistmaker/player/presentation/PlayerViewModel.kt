@@ -65,8 +65,8 @@ class PlayerViewModel(
 
     fun onClickedPlaylist(track: Track, playlist: Playlist) {
         viewModelScope.launch {
-            val song = playlist.trackList.filter { it.trackId == track.trackId }
-            if (song.isNotEmpty()) bottomSheetState.emit(BottomSheetState.TrackExistInPlaylist(playlist.name))
+            println("qqqq ${playlist.trackList}\n${track.trackId}")
+            if (playlistDbInteractor.isTrackAlreadyInPlaylist(playlist.id, track.trackId)) bottomSheetState.emit(BottomSheetState.TrackExistInPlaylist(playlist.name))
             else {
                 withContext(Dispatchers.IO) {
                     playlistDbInteractor.addToPlaylist(track, playlist)

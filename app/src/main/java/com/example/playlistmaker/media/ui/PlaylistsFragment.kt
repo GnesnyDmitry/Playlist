@@ -18,6 +18,7 @@ import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.media.presentation.PlaylistViewModel
 import com.example.playlistmaker.media.ui.model.PlaylistViewState
 import com.example.playlistmaker.playlist.ui.model.PlaylistFrag
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,20 +40,15 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlists) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.recyclerView.apply {
-            layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = playlistsAdapter
-        }
+        binding.recyclerView.adapter = playlistsAdapter
+//        binding.recyclerView.apply {
+//            layoutManager = GridLayoutManager(requireContext(), 2)
+//            adapter = playlistsAdapter
+//        }
 
-        playlistsAdapter.action = { item ->
-            val id = item.id
-            findNavController().navigate(
-                resId = R.id.action_mediaFrag_to_playlistFrag,
-                args = bundleOf(PlaylistFrag.PLAYLIST_KEY to id)
-            )
-        }
+        playlistsAdapter.action = ::navigateToPlaylist
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main.immediate) {
             viewModel.uiStateFlow.collect { state ->
                 when (state) {
                     is PlaylistViewState.Empty -> { showEmptyList() }
@@ -77,6 +73,13 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlists) {
     private fun showEmptyList() {
         binding.recyclerView.isVisible = false
         binding.placeholderNothingFound.isVisible = true
+    }
+
+    private fun navigateToPlaylist(item: Playlist) {
+        findNavController().navigate(
+            resId = R.id.action_mediaFrag_to_playlistFrag,
+            args = bundleOf(PlaylistFrag.PLAYLIST_KEY to item.id)
+        )
     }
 
     override fun onDestroyView() {

@@ -38,7 +38,6 @@ class PlayerActivity : AppCompatActivity() {
     private val bottomSheetContainer by lazy { findViewById<ConstraintLayout>(R.id.bottom_sheet) }
     private val bottomSheetBehavior by lazy { BottomSheetBehavior.from(bottomSheetContainer) }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)

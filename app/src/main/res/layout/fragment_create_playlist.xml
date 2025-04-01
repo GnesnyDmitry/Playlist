@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/create_album_frag"
+    android:id="@+id/create_playlist_frag"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/search_root">
@@ -31,15 +31,16 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/size_16dp" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/add_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/size_8dp"
         android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RoundedImage"
         android:src="@drawable/dashed_border_for_album"
         app:layout_constraintBottom_toTopOf="@id/edit_text_name_playlist"
-        app:layout_constraintDimensionRatio="w,4:3"
+        app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="@id/right_guideline_24"
         app:layout_constraintStart_toStartOf="@id/left_guideline_24"
         app:layout_constraintTop_toBottomOf="@id/toolbar"

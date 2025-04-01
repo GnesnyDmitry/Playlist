@@ -1,6 +1,7 @@
 package com.example.playlistmaker.playlist.ui.model
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,10 +27,10 @@ import com.example.playlistmaker.tools.getTimeFormat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.util.Locale
 
 class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
 
@@ -39,6 +40,7 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
     private var trackBottomSheet: BottomSheetBehavior<ConstraintLayout>? = null
     private var dotsBottomSheet: BottomSheetBehavior<ConstraintLayout>? = null
     private var trackDialog: AlertDialog? = null
+    private var playlistTotalTime: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,8 +59,32 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
         dotsBottomSheet = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getPlaylist()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.uiStateflow.collect { state ->
+                when (state) {
+                    is PlaylistState.Default -> {  }
+                    is PlaylistState.EmptyShare -> { showSnack(false) }
+                    is PlaylistState.Share -> { showShareApps(state.playlist, state.tracks) }
+                    is PlaylistState.Dots -> { showDotsBottomSheet(state.playlist) }
+                    is PlaylistState.EmptyBottomSheet -> {
+                        showSnack(true)
+                        drawScreen(state.playlist)
+                    }
+                    is PlaylistState.SuccessBottomSheet -> {
+                        playlistTotalTime = state.totalTime
+                        drawScreenWithBottomSheet(state.playlist, state.tracks)
+                    }
+                }
+            }
+        }
 
         trackBottomSheet = BottomSheetBehavior.from(binding.tracksBottomSheet.root)
         dotsBottomSheet = BottomSheetBehavior.from(binding.dotsBottomsSheet.root)
@@ -75,44 +101,26 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
         binding.back.setNavigationOnClickListener { findNavController().popBackStack() }
         binding.share.setOnClickListener { viewModel.onClickShare() }
         binding.dots.setOnClickListener { viewModel.onClickDots() }
-
-        viewModel.getPlaylist()
-
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.uiStateflow.collect { state ->
-                when (state) {
-                    is PlaylistState.Default -> {  }
-                    is PlaylistState.EmptyShare -> { showSnack(false) }
-                    is PlaylistState.Share -> { showShareApps(state.playlist) }
-                    is PlaylistState.Dots -> { showDotsBottomSheet(state.playlist) }
-                    is PlaylistState.EmptyBottomSheet -> {
-                        showSnack(true)
-                        drawScreen(state.playlist)
-                    }
-                    is PlaylistState.SuccessBottomSheet -> { drawScreenWithBottomSheet(state.playlist) }
-                }
-            }
-        }
     }
 
-    private fun showShareApps(playlist: Playlist) {
+    private fun showShareApps(playlist: Playlist, tracks: List<Track>) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_TEXT, playlistToString(playlist))
+            putExtra(Intent.EXTRA_TEXT, playlistToString(playlist, tracks))
             type = "text/plain"
         }
         val chooserIntent = Intent.createChooser(shareIntent, "Share APK")
         activity?.startActivity(chooserIntent)
     }
 
-    private fun playlistToString(playlist: Playlist): String {
+    private fun playlistToString(playlist: Playlist, tracks: List<Track>): String {
         val stringB = StringBuilder()
-        stringB.append("${playlist.name}")
-        stringB.append("${playlist.description}")
+        stringB.append("${playlist.name}\n")
+        stringB.append("${playlist.description}\n")
         stringB.append(resources.getQuantityString(R.plurals.track_count, playlist.trackCount, playlist.trackCount) + "\n\n")
-
-        for ((index, track) in playlist.trackList.withIndex()) {
-            stringB.append("${index + 1}. ${track.artistName} - ${track.trackName} (${track.trackTimeMillis.getTimeFormat()})\n")
+        tracks.forEachIndexed { index, track ->
+            stringB.append("${index + 1}. ${track.artistName} - ${track.trackName} (${toMinute(track.trackTimeMillis)})\n")
         }
+
         return stringB.toString()
     }
 
@@ -120,7 +128,7 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
 
         with(binding.dotsBottomsSheet) {
             item.artistName.text = playlist.name
-            item.timeTrack.text = getTimeAllTracks(playlist.trackList)
+            item.timeTrack.text = toMinute(playlistTotalTime)
             share.setOnClickListener { viewModel.onClickShare() }
             remove.setOnClickListener { preparePlaylistDialog() }
             change.setOnClickListener {
@@ -174,10 +182,10 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
             .show()
     }
 
-    private fun drawScreenWithBottomSheet(playlist: Playlist) {
+    private fun drawScreenWithBottomSheet(playlist: Playlist, tracks: List<Track>) {
         drawScreen(playlist)
         trackAdapter.items.clear()
-        trackAdapter.items = playlist.trackList.toMutableList()
+        trackAdapter.items = tracks.toMutableList()
         binding.tracksBottomSheet.recycler.adapter = trackAdapter
         trackBottomSheet?.isHideable = false
         trackBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
@@ -193,22 +201,26 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
         with(binding) {
             name.text = playlist.name
             year.text = playlist.description
-            time.text = getTimeAllTracks(playlist.trackList)
+            time.text = toMinute(playlistTotalTime)
             trackCount.text = getTrackCount(playlist.trackCount)
         }
         if (playlist.trackList.isEmpty()) {
             trackBottomSheet?.isHideable = true
             trackBottomSheet?.state = BottomSheetBehavior.STATE_HIDDEN
         }
+        dotsBottomSheet?.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun getTrackCount(count: Int): String {
         return resources.getQuantityString(R.plurals.track_count, count, count)
     }
-    private fun getTimeAllTracks(list: List<Track>): String {
-        val durationMilliseconds = list.fold(0L) { acc, track -> acc + track.trackTimeMillis }
-        val durationMinutes = (durationMilliseconds / (1000 * 60)).toString()
-        return durationMinutes
+
+    private fun toMinute(totalTime: Int?): String {
+        val timeMinute = totalTime?.div(1000)?.div(60) ?: 0
+        val config = Configuration(requireContext().resources.configuration)
+        config.setLocale((Locale("ru")))
+        val localizedContext = requireContext().createConfigurationContext(config)
+        return localizedContext.resources.getQuantityString(R.plurals.minutes_count, timeMinute, timeMinute)
     }
 
     companion object { const val PLAYLIST_KEY = "playlist_key" }

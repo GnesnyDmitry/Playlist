@@ -40,6 +40,7 @@ class SearchFrag : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -74,6 +75,10 @@ class SearchFrag : Fragment() {
             viewModel.onClickClearEditText()
         }
 
+        viewModel.tracksSearch.observe(viewLifecycleOwner) { list ->
+            if (list.isNotEmpty()) showNewTracks(list)
+        }
+
         viewModel.searchViewStateLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SearchViewState.Default -> {
@@ -93,6 +98,7 @@ class SearchFrag : Fragment() {
                 }
 
                 is SearchViewState.SearchContent -> {
+                    viewModel.updateTrackList(state.list)
                     println("qqq $state search content")
                     showNewTracks(list = state.list)
                 }

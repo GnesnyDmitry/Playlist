@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/albumFrag"
         android:name="com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag"
-        android:label="fragment_create_album"
+        android:label="fragment_create_platlist"
         tools:layout="@layout/fragment_create_playlist" />
 
     <fragment

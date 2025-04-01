@@ -19,6 +19,7 @@ val dataBaseModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), PlaylistDataBase::class.java, "playlists_tracks_database.db")
+            .fallbackToDestructiveMigration()
             .build()
     }
 

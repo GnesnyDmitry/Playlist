@@ -1,9 +1,7 @@
 package com.example.playlistmaker.edit_playlist.ui
 
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
@@ -11,7 +9,6 @@ import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.edit_playlist.presentation.EditPlaylistViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 class EditPlaylistFrag : CreatePlaylistFrag() {
 
     override val viewModel by viewModel<EditPlaylistViewModel>()

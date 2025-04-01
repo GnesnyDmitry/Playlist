@@ -15,13 +15,15 @@ import com.example.playlistmaker.search.ui.model.SearchViewState
 import com.example.playlistmaker.tools.DELAY1000L
 import com.example.playlistmaker.tools.debounce
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel() {
 
-    private val trackList = mutableListOf<Track>()
+    private val trackListHistory = mutableListOf<Track>()
     private var latestText: String = ""
+
+    private val tracksSearchLiveData = MutableLiveData<List<Track>>()
+    val tracksSearch: LiveData<List<Track>> = tracksSearchLiveData
 
     private val searchViewState = MutableLiveData<SearchViewState>()
 
@@ -41,12 +43,16 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
     fun searchViewStateLiveData(): LiveData<SearchViewState> = searchViewState
 
     init {
-        trackList.addAll(searchInteractor.getTracksFromLocalStorage(HISTORY_KEY))
+        trackListHistory.addAll(searchInteractor.getTracksFromLocalStorage(HISTORY_KEY))
+    }
+
+    fun updateTrackList(newTracks: List<Track>) {
+        tracksSearchLiveData.postValue(newTracks)
     }
 
     fun onClickedTrack(track: Track) {
         viewModelScope.launch(Dispatchers.IO) {
-            searchInteractor.saveTrackToLocalStorage(HISTORY_KEY, trackList, track)
+            searchInteractor.saveTrackToLocalStorage(HISTORY_KEY, trackListHistory, track)
         }
     }
 
