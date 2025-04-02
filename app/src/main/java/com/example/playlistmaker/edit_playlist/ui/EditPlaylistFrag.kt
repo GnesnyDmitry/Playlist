@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.edit_playlist.presentation.EditPlaylistViewModel
@@ -25,8 +26,10 @@ class EditPlaylistFrag : CreatePlaylistFrag() {
             createPlaylist.text = "Сохранить"
             toolbar.title = "Редактировать"
         }
+
         Glide.with(this)
             .load(playlist.uri)
+            .placeholder(R.drawable.placeholder_for_edit_frag)
             .transform(RoundedCorners(8))
             .into(binding.addImage)
     }

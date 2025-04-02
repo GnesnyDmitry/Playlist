@@ -53,5 +53,7 @@
     <color name="ic_share">#1A1B22</color>
     <color name="frag_playlist_text">#1A1B22</color>
 
+    <color name="bottom_sheet_header">#E6E8EB</color>
+
 
 </resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:width="300dp"
+        android:height="300dp">
+        <shape android:shape="rectangle">
+            <stroke
+                android:color="@color/gray"
+                android:width="2dp"
+                android:dashWidth="24dp"
+                android:dashGap="24dp"/>
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/placeholder"/>
+</layer-list>

@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            bottomNavigationView.visibility = if (destination.id in listOf(R.id.albumFrag, R.id.editPlaylistFrag))
+            bottomNavigationView.visibility = if (destination.id in listOf(R.id.albumFrag, R.id.editPlaylistFrag, R.id.playlistFrag))
                 View.GONE else View.VISIBLE
         }
     }

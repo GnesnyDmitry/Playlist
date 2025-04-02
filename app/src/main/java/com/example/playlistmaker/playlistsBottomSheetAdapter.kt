@@ -46,9 +46,10 @@ class playlistsBottomSheetAdapter(): RecyclerView.Adapter<playlistsBottomSheetAd
                 playlist.trackCount,
                 playlist.trackCount
             )
+            val uri = playlist.uri.takeIf { !it.isNullOrEmpty() }
 
             Glide.with(itemView.context)
-                .load(playlist.uri)
+                .load(uri ?: R.drawable.placeholder)
                 .placeholder(R.drawable.placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(4))

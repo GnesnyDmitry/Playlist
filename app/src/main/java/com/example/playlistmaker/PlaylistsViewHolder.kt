@@ -27,9 +27,10 @@ class PlaylistsViewHolder(
             item.trackCount,
             item.trackCount
         )
+        val uri = item.uri.takeIf { !it.isNullOrEmpty() }
 
         Glide.with(itemView.context)
-            .load(item.uri)
+            .load(uri ?: R.drawable.placeholder)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
             .transform(RoundedCorners(8))

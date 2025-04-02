@@ -34,7 +34,8 @@ class PlaylistRepositoryImpl(
     }
 
     override suspend fun removePlaylist(playlistId: Long) {
-        dataBase.playlistDao().removePlaylistById(playlistId)
+        dataBase.playlistDao().removePlaylistWithTracks(playlistId)
+
     }
 
     override suspend fun updatePlaylist(id: Long, uri: String, name: String, description: String) {

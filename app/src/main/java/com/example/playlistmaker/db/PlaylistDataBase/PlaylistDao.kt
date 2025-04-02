@@ -68,6 +68,21 @@ interface PlaylistDao {
     @Query("DELETE FROM playlists_tracks WHERE id = :id;")
     suspend fun removePlaylistById(id: Long)
 
+    @Transaction
+    suspend fun removePlaylistWithTracks(playlistId: Long) {
+        val tracks = getTracksForPlaylist(playlistId)
+
+        for (track in tracks) {
+            removeTrackFromPlaylist(playlistId, track.id)
+            val relationCount = countPlaylistRelations(track.id)
+            if (relationCount == 0) {
+                deleteTrack(track)
+            }
+        }
+
+        removePlaylistById(playlistId)
+    }
+
     @Query("SELECT COUNT(*) FROM tracks_playlist_cross_ref WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun isTrackInPlaylist(playlistId: Long, trackId: String): Int
 }

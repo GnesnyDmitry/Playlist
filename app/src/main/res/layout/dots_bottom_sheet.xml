@@ -39,6 +39,7 @@
         android:paddingEnd="@dimen/size_16dp"
         android:text="@string/share"
         android:textSize="@dimen/size_16sp"
+        android:textColor="@color/frag_playlist_text"
         app:layout_constraintTop_toBottomOf="@id/item"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -51,6 +52,7 @@
         android:paddingEnd="@dimen/size_16dp"
         android:text="@string/change_information"
         android:textSize="@dimen/size_16sp"
+        android:textColor="@color/frag_playlist_text"
         app:layout_constraintTop_toBottomOf="@id/share"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -64,6 +66,7 @@
         android:paddingEnd="@dimen/size_16dp"
         android:text="@string/delete_playlist"
         android:textSize="@dimen/size_16sp"
+        android:textColor="@color/frag_playlist_text"
         app:layout_constraintTop_toBottomOf="@id/change"
         app:layout_constraintStart_toStartOf="parent"/>
 

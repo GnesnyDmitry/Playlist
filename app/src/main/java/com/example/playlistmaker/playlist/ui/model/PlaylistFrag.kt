@@ -185,7 +185,7 @@ class PlaylistFrag: Fragment(R.layout.fragment_playlist) {
     private fun drawScreenWithBottomSheet(playlist: Playlist, tracks: List<Track>) {
         drawScreen(playlist)
         trackAdapter.items.clear()
-        trackAdapter.items = tracks.toMutableList()
+        trackAdapter.items = tracks.toMutableList().asReversed()
         binding.tracksBottomSheet.recycler.adapter = trackAdapter
         trackBottomSheet?.isHideable = false
         trackBottomSheet?.state = BottomSheetBehavior.STATE_EXPANDED
