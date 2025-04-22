@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.PlaybackButtonView
 import com.example.playlistmaker.playlistsBottomSheetAdapter
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
@@ -31,7 +32,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlayerActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityAudioPlayerBinding.inflate(layoutInflater) }
-    private lateinit var btnPlay: ImageView
+    private lateinit var btnPlay: PlaybackButtonView
     private val viewModel by viewModel<PlayerViewModel>()
     private val router = PlayerRouter(this)
     private val playlistAdapter by lazy { playlistsBottomSheetAdapter() }
@@ -89,9 +90,7 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.onClickAddTrackInPlaylist()
         }
 
-        btnPlay.setOnClickListener {
-            viewModel.onClickedBtnPlay()
-        }
+        btnPlay.addListener(viewModel::onClickedBtnPlay)
 
         binding.bottomSheet.newAlbum.setOnClickListener {
             hideBottomSheet()
@@ -107,15 +106,15 @@ class PlayerActivity : AppCompatActivity() {
                     when (state.state) {
                         PlayButtonState.PREPARED -> {
                             updateTrackTimer(0)
-                            changeImageForPlayButton(R.drawable.player_play)
+                            btnPlay.setPlayBtnState(false)
                         }
 
                         PlayButtonState.PLAY -> {
-                            changeImageForPlayButton(R.drawable.player_pause)
+                            btnPlay.setPlayBtnState(true)
                         }
 
                         PlayButtonState.PAUSE -> {
-                            changeImageForPlayButton(R.drawable.player_play)
+                            btnPlay.setPlayBtnState(false)
                         }
                     }
                 }
@@ -193,12 +192,6 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 }
             })
-        }
-    }
-
-    private fun changeImageForPlayButton(image: Int?) {
-        image?.let {
-            btnPlay.setImageResource(image)
         }
     }
 
