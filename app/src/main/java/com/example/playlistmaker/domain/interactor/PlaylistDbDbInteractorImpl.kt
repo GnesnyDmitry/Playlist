@@ -22,20 +22,28 @@ class PlaylistDbDbInteractorImpl(
     }
 
     override suspend fun addToPlaylist(track: Track, playlist: Playlist) {
-        playlistRepository.refreshPlaylist(playlist.copy(trackList = listOf(track) + playlist.trackList))
+        playlistRepository.addTrack(track, playlist.id)
     }
 
     override suspend fun removeTrack(playlistId: Long, trackId: Int) {
-        var playlist = playlistRepository.getPlaylist(playlistId)
-        playlist = playlist.copy(trackList = playlist.trackList.filter { it.trackId != trackId })
-        playlistRepository.refreshPlaylist(playlist)
+        playlistRepository.removeTrack(playlistId, trackId)
     }
 
     override suspend fun removePlaylist(playlistId: Long) {
         playlistRepository.removePlaylist(playlistId)
     }
 
-    override suspend fun updateAlbum(id: Long, uri: String, name: String, description: String) {
+    override suspend fun updatePlaylist(id: Long, uri: String, name: String, description: String) {
         playlistRepository.updatePlaylist(id, uri, name, description)
     }
+
+    override suspend fun getTracks(playlistId: Long): List<Track> {
+        return playlistRepository.getTracks(playlistId)
+    }
+
+    override suspend fun isTrackAlreadyInPlaylist(playlistId: Long, trackId: Int): Boolean {
+        return playlistRepository.isTrackAlreadyInPlaylist(playlistId, trackId.toString())
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.playlistmaker.creat_album.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,17 +20,20 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.presentation.CreatePlaylistViewModel
 import com.example.playlistmaker.creat_album.ui.model.CreatePlaylistViewState
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
+import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.main.MainActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.playlistmaker.tools.TRACK_KEY
+import com.example.playlistmaker.tools.getParcelableFromBundle
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
+open class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
 
-    private lateinit var binding: FragmentCreatePlaylistBinding
-    private val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected lateinit var binding: FragmentCreatePlaylistBinding
+    protected open val viewModel by viewModel<CreatePlaylistViewModel>()
+    protected val playlist by lazy { arguments?.getParcelableFromBundle(TRACK_KEY, Playlist::class.java) }
     private var dialogGoBack: AlertDialog? = null
 
     val pickMediaForPlaylist =
@@ -75,7 +79,10 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             viewModel.uiStateFlow.collect { state ->
                 when (state) {
-                    is CreatePlaylistViewState.SavePlaylist -> { savePlaylist(state.name) }
+                    is CreatePlaylistViewState.SavePlaylist -> {
+                        savePlaylist(state.name)
+
+                    }
                     is CreatePlaylistViewState.Default -> {  }
                     is CreatePlaylistViewState.GoBack -> { goBack() }
                     is CreatePlaylistViewState.ShowDialog -> { dialogGoBack?.show() }
@@ -84,7 +91,7 @@ class CreatePlaylistFrag : Fragment(R.layout.fragment_create_playlist) {
         }
 
         binding.createPlaylist.setOnClickListener {
-            viewModel.createPlaylist()
+            viewModel.createPlaylist(playlist)
         }
 
         binding.addImage.setOnClickListener {

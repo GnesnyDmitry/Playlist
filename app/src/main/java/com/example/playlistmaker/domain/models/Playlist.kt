@@ -9,6 +9,6 @@ data class Playlist(
     val uri: String = "",
     val name: String = "",
     val description: String = "",
-    val trackList: List<Track> = emptyList(),
+    val trackList: List<String> = emptyList(),
     val trackCount: Int = 0,
 ): Parcelable

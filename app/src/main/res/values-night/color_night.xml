@@ -37,4 +37,8 @@
     <color name="text_for_bottom_sheet_recycler">#FFFFFF</color>
 
     <color name="edittext_create_playlist">#1A1B22</color>
+    <color name="ic_share">#FFFFFF</color>
+    <color name="frag_playlist_text">#FFFFFF</color>
+
+    <color name="bottom_sheet_header">#FFFFFF</color>
 </resources>

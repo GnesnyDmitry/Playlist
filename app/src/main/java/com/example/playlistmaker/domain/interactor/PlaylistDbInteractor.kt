@@ -12,5 +12,7 @@ interface PlaylistDbInteractor {
     suspend fun getPlaylist(id: Long): Playlist
     suspend fun removeTrack(playlistId: Long, trackId: Int)
     suspend fun removePlaylist(playlistId: Long)
-    suspend fun updateAlbum(id: Long, uri: String, name: String, description: String)
+    suspend fun updatePlaylist(id: Long, uri: String, name: String, description: String)
+    suspend fun getTracks(playlistId: Long): List<Track>
+    suspend fun isTrackAlreadyInPlaylist(playlistId: Long, trackId: Int): Boolean
 }

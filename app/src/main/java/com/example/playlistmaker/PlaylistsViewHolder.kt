@@ -4,11 +4,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.tools.BaseViewHolder
 
-class PlaylistViewHolder(
+class PlaylistsViewHolder(
     parent: ViewGroup,
     private val action: ((Playlist) -> Unit)?
 ) : BaseViewHolder<Playlist>(parent, R.layout.playlist_item) {
@@ -18,20 +18,23 @@ class PlaylistViewHolder(
     private val picturePlaylist: ImageView = itemView.findViewById(R.id.playlist_image)
 
     override fun bind(item: Playlist) {
+        itemView.isClickable = true
+        itemView.setOnClickListener { action?.invoke(item) }
+
         playlistName.text = item.name
         playlistTrackCount.text = itemView.context.resources.getQuantityString(
             R.plurals.track_count,
             item.trackCount,
             item.trackCount
         )
+        val uri = item.uri.takeIf { !it.isNullOrEmpty() }
 
         Glide.with(itemView.context)
-            .load(item.uri)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            .load(uri ?: R.drawable.placeholder)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
+            .transform(RoundedCorners(8))
+            .dontAnimate()
             .into(picturePlaylist)
-
-        itemView.setOnClickListener { action?.invoke(item) }
     }
 }
