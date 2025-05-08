@@ -1,18 +1,25 @@
 package com.example.playlistmaker.player.ui
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.View
-import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.PlaybackButtonView
-import com.example.playlistmaker.playlistsBottomSheetAdapter
+import com.example.playlistmaker.MediaService
+import com.example.playlistmaker.MediaServiceController
+import com.example.playlistmaker.adapters.playlistsBottomSheetAdapter
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creat_album.ui.CreatePlaylistFrag
 import com.example.playlistmaker.databinding.ActivityAudioPlayerBinding
@@ -38,10 +45,53 @@ class PlayerActivity : AppCompatActivity() {
     private val playlistAdapter by lazy { playlistsBottomSheetAdapter() }
     private val bottomSheetContainer by lazy { findViewById<ConstraintLayout>(R.id.bottom_sheet) }
     private val bottomSheetBehavior by lazy { BottomSheetBehavior.from(bottomSheetContainer) }
+    private var serviceBound = false
+    private var playerService: MediaServiceController? = null
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MediaService.LocalBinder
+            playerService = binder.getService()
+            playerService.let { viewModel.bindService(it) }
+            serviceBound = true
+
+            getTrack().previewUrl?.let { viewModel.preparePlayer(it) }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            serviceBound = false
+            playerService = null
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.showNotification(getTrack().artistName, getTrack().trackName)
+        val serviceIntent = Intent(this, MediaService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.hideNotification()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+            }
+        }
+
+
+        val serviceIntent = Intent(this, MediaService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         initBottomSheet()
 
@@ -55,7 +105,7 @@ class PlayerActivity : AppCompatActivity() {
 
         track.let {
             viewModel.getFavoriteState(track.trackId)
-            track.previewUrl?.let { url -> viewModel.preparePlayer(url) }
+//            track.previewUrl?.let { url -> viewModel.preparePlayer(url) }
             binding.apply {
 
                 Glide.with(root)
@@ -100,27 +150,29 @@ class PlayerActivity : AppCompatActivity() {
                 .commit()
         }
 
-        viewModel.playBtnStateLiveData().observe(this) { state ->
-            when (state) {
-                is PlayerViewState.PlayBtn -> {
-                    when (state.state) {
-                        PlayButtonState.PREPARED -> {
-                            updateTrackTimer(0)
-                            btnPlay.setPlayBtnState(false)
-                        }
+        lifecycleScope.launch {
+            viewModel.playerViewStateFlow.collect { state ->
+                when (state) {
+                    is PlayerViewState.PlayBtn -> {
+                        when (state.state) {
+                            PlayButtonState.PREPARED -> {
+                                updateTrackTimer(0)
+                                btnPlay.setPlayBtnState(false)
+                            }
 
-                        PlayButtonState.PLAY -> {
-                            btnPlay.setPlayBtnState(true)
-                        }
+                            PlayButtonState.PLAY -> {
+                                btnPlay.setPlayBtnState(true)
+                            }
 
-                        PlayButtonState.PAUSE -> {
-                            btnPlay.setPlayBtnState(false)
+                            PlayButtonState.PAUSE -> {
+                                btnPlay.setPlayBtnState(false)
+                            }
                         }
                     }
-                }
 
-                is PlayerViewState.TrackTime -> {
-                    updateTrackTimer(state.state)
+                    is PlayerViewState.TrackTime -> {
+                        updateTrackTimer(state.state)
+                    }
                 }
             }
         }
@@ -131,12 +183,15 @@ class PlayerActivity : AppCompatActivity() {
                     is BottomSheetState.Empty -> {
                         showPlaylists(emptyList())
                     }
+
                     is BottomSheetState.Playlists -> {
                         showPlaylists(state.playlists)
                     }
+
                     is BottomSheetState.TrackExistInPlaylist -> {
                         showSnackbar("Трек уже добавлен в плейлист ${state.playlistName}")
                     }
+
                     is BottomSheetState.AddNewTrackInPlaylist -> {
                         showSnackbar("Добавлено в плейлист ${state.playlistName}")
                         hideBottomSheet()
@@ -144,11 +199,6 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        viewModel.stopTrack()
     }
 
     private fun showSnackbar(message: String) {
@@ -164,7 +214,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.bottomSheet.recycler.adapter = playlistAdapter
         playlistAdapter.notifyDataSetChanged()
     }
-    
+
     private fun hideBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
@@ -208,5 +258,13 @@ class PlayerActivity : AppCompatActivity() {
                 intent.getParcelableExtra(SearchFrag.TRACK_KEY)
             }
         return requireNotNull(track)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (serviceBound) {
+            unbindService(serviceConnection)
+            serviceBound = false
+        }
     }
 }

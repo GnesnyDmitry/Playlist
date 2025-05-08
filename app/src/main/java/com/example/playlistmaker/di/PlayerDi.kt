@@ -25,7 +25,7 @@ val playerModule = module {
         )
     }
 
-    factory<PlayerRepository> {
+    single<PlayerRepository> {
         PlayerRepositoryImpl(
             mediaPlayer = get(),
             tracksDataBase = get(),
@@ -33,5 +33,5 @@ val playerModule = module {
         )
     }
 
-    factory { MediaPlayer() }
+    single { MediaPlayer() }
 }
