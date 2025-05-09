@@ -64,11 +64,17 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.showNotification(getTrack().artistName, getTrack().trackName)
-        val serviceIntent = Intent(this, MediaService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
+    override fun onStop() {
+        super.onStop()
+
+        if (isFinishing) {
+            viewModel.stopTrack()
+            viewModel.hideNotification()
+        } else {
+            viewModel.showNotification(getTrack().artistName, getTrack().trackName)
+            val serviceIntent = Intent(this, MediaService::class.java)
+            ContextCompat.startForegroundService(this, serviceIntent)
+        }
     }
 
     override fun onResume() {

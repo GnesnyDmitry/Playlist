@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +37,7 @@ class MediaService : Service(), MediaServiceController, KoinComponent {
     override val playerStateFlow: StateFlow<PlayerViewState>
         get() = playerState.asStateFlow()
 
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var timerJob: Job? = null
 
     private val notificationId = 1
@@ -55,6 +56,11 @@ class MediaService : Service(), MediaServiceController, KoinComponent {
         createNotificationChannel()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
+    }
+
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
@@ -63,12 +69,12 @@ class MediaService : Service(), MediaServiceController, KoinComponent {
         playerState.value = PlayerViewState.PlayBtn(PlayButtonState.PREPARED)
         interactor.prepareMediaPlayer(uri)
         interactor.onTrackEnd {
+            hideNotification()
             playerState.value = PlayerViewState.PlayBtn(PlayButtonState.PREPARED)
         }
     }
 
     override fun play() {
-        println("qqq play mediaService")
         interactor.startTrack()
         trackTimer()
         playerState.value = PlayerViewState.PlayBtn(PlayButtonState.PLAY)
