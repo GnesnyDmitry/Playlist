@@ -99,7 +99,7 @@
         app:layout_constraintTop_toBottomOf="@id/artist_name"
         app:layout_constraintTop_toTopOf="@id/btn_play" />
 
-    <com.example.playlistmaker.PlaybackButtonView
+    <com.example.playlistmaker.player.ui.PlaybackButtonView
         android:id="@+id/btn_play"
         android:layout_width="84dp"
         android:layout_height="84dp"

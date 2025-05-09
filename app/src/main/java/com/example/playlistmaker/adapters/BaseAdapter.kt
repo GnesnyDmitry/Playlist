@@ -1,11 +1,10 @@
-package com.example.playlistmaker.tools
+package com.example.playlistmaker.adapters
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.PlaylistsViewHolder
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.TrackViewHolder
 import com.example.playlistmaker.domain.models.Playlist
+import com.example.playlistmaker.tools.ItemViewType
 
 
 abstract class BaseAdapter<T, VH: BaseViewHolder<T>>(

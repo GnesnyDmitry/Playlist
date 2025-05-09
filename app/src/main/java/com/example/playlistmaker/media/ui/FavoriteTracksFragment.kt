@@ -11,12 +11,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.playlistmaker.TrackAdapter
+import com.example.playlistmaker.adapters.TrackAdapter
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.media.presentation.FavoriteTracksViewModel
 import com.example.playlistmaker.search.ui.SearchRouter
-import com.example.playlistmaker.tools.Debouncer
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

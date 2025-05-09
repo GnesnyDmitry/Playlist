@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.PlaybackButtonView
+import com.example.playlistmaker.MediaServiceController
 import com.example.playlistmaker.domain.interactor.PlaylistDbInteractor
 import com.example.playlistmaker.domain.models.Playlist
 import com.example.playlistmaker.domain.models.Track
@@ -21,6 +21,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -31,20 +34,34 @@ class PlayerViewModel(
     private val playlistDbInteractor: PlaylistDbInteractor
 ) : ViewModel() {
 
-    private val playerViewState = MutableLiveData<PlayerViewState>()
+    private val playerViewState = MutableStateFlow<PlayerViewState>(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
     private val btnLikeState = SingleLiveEvent<Boolean>()
 
-    fun playBtnStateLiveData(): LiveData<PlayerViewState> = playerViewState
+    val playerViewStateFlow: StateFlow<PlayerViewState> = playerViewState.asStateFlow()
     fun btnLikeLiveData(): LiveData<Boolean> = btnLikeState
 
     private val bottomSheetState = MutableStateFlow<BottomSheetState>(BottomSheetState.Empty)
     val bottomSheetStateFlow: StateFlow<BottomSheetState> = bottomSheetState.asStateFlow()
 
-    private var timerJob: Job? = null
+    private var mediaServiceController: MediaServiceController? = null
 
     override fun onCleared() {
         super.onCleared()
-        playerInteractor.stopMediaPlayer()
+        mediaServiceController?.stop()
+        mediaServiceController = null
+    }
+
+    fun bindService(controller: MediaServiceController?) {
+        mediaServiceController = controller
+
+        viewModelScope.launch {
+            controller?.playerStateFlow?.collect { state ->
+                when (state) {
+                    is PlayerViewState.TrackTime -> playerViewState.emit(state)
+                    is PlayerViewState.PlayBtn -> playerViewState.emit(state)
+                }
+            }
+        }
     }
 
     fun getFavoriteState(id: Int) {
@@ -89,18 +106,20 @@ class PlayerViewModel(
         }
     }
 
+    fun showNotification(title: String, artist: String) {
+        mediaServiceController?.showNotification(title, artist)
+    }
+
+    fun hideNotification() {
+        mediaServiceController?.hideNotification()
+    }
+
     fun preparePlayer(url: String) {
-        playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
-        playerInteractor.prepareMediaPlayer(url)
-        playerInteractor.onTrackEnd {
-            playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PREPARED))
-        }
+        mediaServiceController?.prepareMediaPlayer(url)
     }
 
     fun stopTrack() {
-        playerViewState.postValue(PlayerViewState.PlayBtn(PlayButtonState.PAUSE))
-        playerInteractor.stopTrack()
-        timerJob?.cancel()
+        mediaServiceController?.pause()
     }
 
     fun onClickedBtnPlay() {
@@ -108,22 +127,11 @@ class PlayerViewModel(
             MediaPlayerState.PREPARED -> onTrackStart()
             MediaPlayerState.PLAYING -> stopTrack()
             MediaPlayerState.PAUSED -> onTrackStart()
-            MediaPlayerState.DEFAULT -> playerViewState.postValue(
-                PlayerViewState.PlayBtn(
-                    PlayButtonState.PREPARED
-                )
-            )
+            MediaPlayerState.DEFAULT -> playerViewState.value = PlayerViewState.PlayBtn(PlayButtonState.PREPARED)
         }
     }
 
     private fun onTrackStart() {
-        playerViewState.value = PlayerViewState.PlayBtn(PlayButtonState.PLAY)
-        playerInteractor.startTrack()
-        timerJob = viewModelScope.launch {
-            while (playerInteractor.getState() == MediaPlayerState.PLAYING) {
-                playerViewState.postValue(PlayerViewState.TrackTime(playerInteractor.getTime()))
-                delay(DELAY300L)
-            }
-        }
+        mediaServiceController?.play()
     }
 }

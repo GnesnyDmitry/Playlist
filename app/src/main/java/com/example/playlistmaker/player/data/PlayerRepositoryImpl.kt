@@ -33,9 +33,11 @@ class PlayerRepositoryImpl(
     override fun prepareMediaPlayer(url: String) {
         mediaPlayer.apply {
             reset()
-            setOnPreparedListener { state = MediaPlayerState.PREPARED }
+//            setOnPreparedListener { state = MediaPlayerState.PREPARED }
             setDataSource(url)
             prepare()
+            state = MediaPlayerState.PREPARED
+            println("qqq $state")
         }
     }
 
