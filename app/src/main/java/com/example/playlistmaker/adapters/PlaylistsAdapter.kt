@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.adapters
 
 import com.example.playlistmaker.domain.models.Playlist
-import com.example.playlistmaker.tools.BaseAdapter
 
 class PlaylistsAdapter: BaseAdapter<Playlist, PlaylistsViewHolder>()

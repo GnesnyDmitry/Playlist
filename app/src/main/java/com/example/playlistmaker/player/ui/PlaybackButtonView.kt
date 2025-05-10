@@ -1,8 +1,7 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.player.ui
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.drawable.VectorDrawable
@@ -10,6 +9,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.example.playlistmaker.R
 
 class PlaybackButtonView @JvmOverloads constructor(
     context: Context,
