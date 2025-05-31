@@ -1,31 +1,36 @@
 package com.example.playlistmaker.search.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.ResponseState.Content
 import com.example.playlistmaker.search.domain.ResponseState.Error
 import com.example.playlistmaker.search.domain.ResponseState.NoConnect
 import com.example.playlistmaker.search.domain.ResponseState.NoData
 import com.example.playlistmaker.search.domain.api.TrackInteractor
-import com.example.playlistmaker.search.ui.model.ClearBtnState
+import com.example.playlistmaker.search.ui.SearchScreenUiStateMapper
 import com.example.playlistmaker.search.ui.model.SearchViewState
 import com.example.playlistmaker.tools.DELAY1000L
+import com.example.playlistmaker.tools.TRACK_KEY
 import com.example.playlistmaker.tools.debounce
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel() {
+class SearchViewModel(
+    private val searchInteractor: TrackInteractor,
+    val searchScreenUiStateMapper: SearchScreenUiStateMapper
+) : ViewModel() {
 
     private val trackListHistory = mutableListOf<Track>()
     private var latestText: String = ""
 
-    private val tracksSearchLiveData = MutableLiveData<List<Track>>()
-    val tracksSearch: LiveData<List<Track>> = tracksSearchLiveData
-
-    private val searchViewState = MutableLiveData<SearchViewState>()
+    private val searchViewState = MutableStateFlow<SearchViewState>(SearchViewState.Default)
+    val searchViewStateFlow: StateFlow<SearchViewState> = searchViewState
 
     private var debounceSearchTracks = debounce(
         delayMillis = DELAY1000L,
@@ -40,59 +45,48 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
         }
     }
 
-    fun searchViewStateLiveData(): LiveData<SearchViewState> = searchViewState
-
     init {
         trackListHistory.addAll(searchInteractor.getTracksFromLocalStorage(HISTORY_KEY))
     }
 
-    fun updateTrackList(newTracks: List<Track>) {
-        tracksSearchLiveData.postValue(newTracks)
+    private fun openPlayerActivity(context: Context, track: Track) {
+        val intent = Intent(context, PlayerActivity::class.java)
+        intent.putExtra(TRACK_KEY, track)
+        context.startActivity(intent)
     }
 
-    fun onClickedTrack(track: Track) {
+
+    fun onClickedTrack(track: Track, context: Context) {
+        openPlayerActivity(context, track)
         viewModelScope.launch(Dispatchers.IO) {
             searchInteractor.saveTrackToLocalStorage(HISTORY_KEY, trackListHistory, track)
         }
     }
 
-    fun onClickEditText(query: String) {
-        if (query.isEmpty()) showHistoryContent()
-    }
-
-    fun onClickClearEditText() {
-        searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.DEFAULT)
-        latestText = ""
-        showHistoryContent()
-    }
-
     fun onClickedBtnClearHistory() {
-        searchViewState.postValue(SearchViewState.Default)
+        searchViewState.value = SearchViewState.Default
         searchInteractor.clearTrackLocalStorage(HISTORY_KEY)
     }
 
     fun onTextChange(text: String) {
-        defineState(text)
         if (text.length < 2) {
             debounceSearchTracks(null)
             showHistoryContent()
         } else searchDebounce(text = text)
     }
 
-    fun onClickedRefresh(text: String) {
-        searchViewState.value = SearchViewState.Loading
-        searchTracks(text)
-    }
-
-    private fun showHistoryContent() {
+     fun showHistoryContent() {
         searchViewState.value = SearchViewState.Loading
         viewModelScope.launch {
-            searchViewState.postValue(
+            searchViewState.value =
                 SearchViewState.HistoryContent(
                     searchInteractor.getTracksFromLocalStorage(HISTORY_KEY)
                 )
-            )
         }
+    }
+
+    fun hideHistory() {
+        searchViewState.value = SearchViewState.Default
     }
 
     private fun searchDebounce(text: String) {
@@ -109,22 +103,12 @@ class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel
         viewModelScope.launch(Dispatchers.IO) {
             searchInteractor.searchTracks(query).collect { responseState ->
                 when (responseState) {
-                    is NoConnect -> searchViewState.postValue(SearchViewState.Error)
-                    is Error -> searchViewState.postValue(SearchViewState.Error)
-                    is NoData -> searchViewState.postValue(SearchViewState.NoData(responseState.data))
-                    is Content -> searchViewState.postValue(
-                        SearchViewState.SearchContent(
-                            responseState.data
-                        )
-                    )
+                    is NoConnect -> searchViewState.value = SearchViewState.Error
+                    is Error -> searchViewState.value = SearchViewState.Error
+                    is NoData -> searchViewState.value = SearchViewState.NoData(responseState.data)
+                    is Content -> searchViewState.value = SearchViewState.SearchContent(responseState.data)
                 }
             }
-        }
-    }
-
-    private fun defineState(text: String) {
-        if (text.isNotEmpty()) {
-            searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.TEXT)
         }
     }
 

@@ -13,6 +13,7 @@ import com.example.playlistmaker.search.domain.TrackInteractorImpl
 import com.example.playlistmaker.search.domain.api.TrackInteractor
 import com.example.playlistmaker.search.domain.api.TrackRepository
 import com.example.playlistmaker.search.presentation.SearchViewModel
+import com.example.playlistmaker.search.ui.SearchScreenUiStateMapper
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -24,7 +25,8 @@ val searchModule = module {
 
     viewModel<SearchViewModel> {
         SearchViewModel(
-            searchInteractor = get()
+            searchInteractor = get(),
+            searchScreenUiStateMapper = SearchScreenUiStateMapper()
         )
     }
 
