@@ -1,8 +1,10 @@
 package com.example.playlistmaker.search.ui
 
+import androidx.compose.runtime.Immutable
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.models.Track
 
+@Immutable
 data class SearchScreenUiState(
     val isPlaceholderVisible: Boolean = false,
     val placeholder: Int = R.drawable.ic_placeholder_nothing_found,

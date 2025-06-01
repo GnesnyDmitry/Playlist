@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.playlistmaker.theme.CustomTheme
 import com.example.playlistmaker.R
@@ -53,10 +54,11 @@ fun SettingScreenContent(
     ) {
         TopAppBar(
             backgroundColor = CustomTheme.colors.background,
+            elevation = 0.dp,
             title = {
                 Text(
                     color = CustomTheme.colors.text,
-                    text = "Настройки"
+                    text = stringResource(R.string.settings)
                 )
             }
         )
@@ -70,7 +72,7 @@ fun SettingScreenContent(
             Text(
                 style = CustomTheme.typography.secondSmall,
                 color = CustomTheme.colors.text,
-                text = "Темная тема"
+                text = stringResource(R.string.theme_night)
             )
             Switch(
                 checked = stateTheme,
@@ -84,9 +86,9 @@ fun SettingScreenContent(
             )
         }
 
-        SettingItem(title = "Поделиться приложением", icon = R.drawable.ic_share, onClick = { shareApp(context) })
-        SettingItem(title = "Написать в поддержку", icon = R.drawable.ic_support, onClick = { contactSupport(context) })
-        SettingItem(title = "Пользовательское соглашение", icon = R.drawable.ic_go_to, onClick = { thermsUse(context) })
+        SettingItem(title = stringResource(R.string.share_app), icon = R.drawable.ic_share, onClick = { shareApp(context) })
+        SettingItem(title = stringResource(R.string.support_message), icon = R.drawable.ic_support, onClick = { contactSupport(context) })
+        SettingItem(title = stringResource(R.string.therms_use), icon = R.drawable.ic_go_to, onClick = { thermsUse(context) })
     }
 }
 

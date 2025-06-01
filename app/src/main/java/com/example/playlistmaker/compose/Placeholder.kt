@@ -9,6 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import com.example.playlistmaker.R
 import com.example.playlistmaker.theme.CustomTheme
 
 @Composable
@@ -23,7 +26,7 @@ fun Placeholder(isVisible: Boolean, placeholder: Int, placeholderText: String) {
             ) {
                 Image(
                     painter = painterResource(placeholder),
-                    contentDescription = "плейсхолдер"
+                    contentDescription = stringResource(R.string.placeholder)
                 )
                 Text(
                     style = CustomTheme.typography.secondSmall,

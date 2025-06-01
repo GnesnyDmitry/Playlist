@@ -40,6 +40,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.playlistmaker.theme.CustomTheme
@@ -48,13 +49,14 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.compose.TrackListItem
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.search.presentation.SearchViewModel
+import com.example.playlistmaker.search.ui.model.SearchViewState
 
 
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
 ) {
-    val state by viewModel.searchViewStateFlow.collectAsState()
+    val state by viewModel.resultFlow.collectAsState(initial = SearchViewState.Default)
     var query by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -92,10 +94,11 @@ fun SearchScreenContent(
             TopAppBar(
                 backgroundColor = CustomTheme.colors.background,
                 contentColor = CustomTheme.colors.text,
+                elevation = 0.dp,
                 title = {
                     Text(
                         style = CustomTheme.typography.medium,
-                        text = "Поиск"
+                        text = stringResource(R.string.search)
                     )
                 })
         }
@@ -132,18 +135,20 @@ fun SearchScreenContent(
                         },
                     value = query,
                     onValueChange = onQueryChange,
+                    singleLine = true,
+                    maxLines = 1,
                     decorationBox = { innerTextField ->
                         TextFieldDefaults.TextFieldDecorationBox(
                             value = query,
                             visualTransformation = VisualTransformation.None,
                             innerTextField = innerTextField,
-                            placeholder = { Text("Поиск") },
+                            placeholder = { Text(stringResource(R.string.search)) },
                             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                             trailingIcon = {
                                 if (query.isNotEmpty()) {
                                     Icon(
                                         painter = painterResource(R.drawable.ic_clear_text),
-                                        contentDescription = "Очистить",
+                                        contentDescription = null,
                                         modifier = Modifier
                                             .clickable { onQueryChange("") }
                                     )
@@ -172,34 +177,30 @@ fun SearchScreenContent(
                     .imePadding()
             ) {
 
-                if (state.tracks.isNotEmpty()) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 10.dp)
-                            .padding(bottom = 72.dp)
-                    ) {
-                        items(state.tracks) { track ->
-                            TrackListItem(track, onClickTrack)
-                        }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(state.tracks) { track ->
+                        TrackListItem(track, onClickTrack)
                     }
-                    if (state.isHistoryButtonClearVisible) {
-                        Button(
-                            onClick = { onClickHistoryClear() },
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .align(Alignment.Center),
-                            shape = RoundedCornerShape(22.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = CustomTheme.colors.secondBackground,
-                                contentColor = CustomTheme.colors.secondText
-                            )
-                        ) {
-                            Text(
-                                style = CustomTheme.typography.secondSmall,
-                                text = "Очистить историю"
-                            )
-                        }
+                }
+                if (state.isHistoryButtonClearVisible) {
+                    Button(
+                        onClick = { onClickHistoryClear() },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.Center),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = CustomTheme.colors.secondBackground,
+                            contentColor = CustomTheme.colors.secondText
+                        )
+                    ) {
+                        Text(
+                            style = CustomTheme.typography.secondSmall,
+                            text = stringResource(R.string.clear_history)
+                        )
                     }
                 }
             }
@@ -214,7 +215,7 @@ fun HistoryHeader(isVisible: Boolean) {
             style = CustomTheme.typography.medium,
             color = CustomTheme.colors.text,
             modifier = Modifier.padding(vertical = 20.dp),
-            text = "Вы искали"
+            text = stringResource(R.string.history_search)
         )
     }
 }

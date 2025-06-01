@@ -27,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -74,7 +76,7 @@ fun PlaylistScreenContent(
         ) {
             Text(
                 style = CustomTheme.typography.secondSmall,
-                text = "Новый плейлист"
+                text = stringResource(R.string.new_playlist)
             )
         }
         PlaylistGrid(state.playlists, onClickPlaylist)
@@ -125,7 +127,11 @@ fun PlaylistItem(playlist: Playlist, onClickPlaylist: (Long) -> Unit) {
             color = CustomTheme.colors.text
         )
         Text(
-            text = "${playlist.trackCount} треков",
+            text = pluralStringResource(
+                id = R.plurals.track_count,
+                count = playlist.trackCount,
+                playlist.trackCount
+            ),
             style = CustomTheme.typography.small,
             color = CustomTheme.colors.text
         )

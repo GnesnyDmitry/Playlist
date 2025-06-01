@@ -21,7 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.playlistmaker.R
 import com.example.playlistmaker.theme.CustomTheme
 import kotlinx.coroutines.launch
 
@@ -42,7 +44,7 @@ fun MediaScreen() {
             title = {
                 Text(
                     style = CustomTheme.typography.medium,
-                    text = "Медиатека"
+                    text = stringResource(R.string.media)
                 )
             }
         )
@@ -71,7 +73,7 @@ fun MediaScreen() {
                     Text(
                         color = CustomTheme.colors.text,
                         style = CustomTheme.typography.secondSmall,
-                        text = "Избранные треки"
+                        text = stringResource(R.string.favorites_tracks)
                     )
                        },
             )
@@ -84,7 +86,7 @@ fun MediaScreen() {
                     Text(
                         color = CustomTheme.colors.text,
                         style = CustomTheme.typography.secondSmall,
-                        text = "Плейлисты"
+                        text = stringResource(R.string.playlists)
                     ) },
             )
         }

@@ -3,6 +3,7 @@ package com.example.playlistmaker.compose
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -46,7 +48,8 @@ fun TrackListItem(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 5.dp)
+                .padding(start = 5.dp),
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 maxLines = 1,
@@ -57,12 +60,16 @@ fun TrackListItem(
             )
             Row {
                 Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = CustomTheme.typography.small,
                     color = CustomTheme.colors.thirdText,
                     text = track.artistName
                 )
                 Image(painter = painterResource(R.drawable.circle), contentDescription = null)
                 Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = CustomTheme.typography.small,
                     color = CustomTheme.colors.thirdText,
                     text = track.trackTimeMillis.getTimeFormat()
@@ -71,7 +78,7 @@ fun TrackListItem(
         }
         Image(
             painter = painterResource(R.drawable.ic_go_to),
-            contentDescription = "Открыть",
+            contentDescription = stringResource(R.string.open),
         )
     }
 }

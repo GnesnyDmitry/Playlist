@@ -41,6 +41,8 @@
     <string name="add_to_playlist">Добавить в плейлист</string>
     <string name="change_information">Редактировать информацию</string>
     <string name="delete_playlist">Удалить плейлист</string>
+    <string name="open">Открыть</string>
+    <string name="placeholder">плейсхолдер</string>
 
     <plurals name="track_count">
         <item quantity="zero">%d треков</item>
