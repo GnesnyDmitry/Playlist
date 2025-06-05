@@ -1,15 +1,14 @@
 package com.example.playlistmaker.setting.presentation
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.setting.domain.api.SettingsInteractor
-import com.example.playlistmaker.tools.SingleLiveEvent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class SettingsViewModel(private val interactor: SettingsInteractor) : ViewModel() {
 
-    private val themeState = SingleLiveEvent<Boolean>()
-
-    fun themeStateLiveData(): LiveData<Boolean> = themeState
+    private val themeState = MutableStateFlow<Boolean>(value = false)
+    val themeStateFlow: StateFlow<Boolean> = themeState
 
     init {
         themeState.value = interactor.getCurrentThemeState()
@@ -18,6 +17,6 @@ class SettingsViewModel(private val interactor: SettingsInteractor) : ViewModel(
     fun changeTheme(theme: Boolean) {
         if (theme == themeState.value) return
         interactor.updateThemeState(theme)
-        themeState.postValue(theme)
+        themeState.value = theme
     }
 }

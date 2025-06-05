@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class PlaylistViewModel(
     private val playlistId: Long,
-    private val playlistDbInteractor: PlaylistDbInteractor
+    private val playlistDbInteractor: PlaylistDbInteractor,
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow<PlaylistState>(PlaylistState.Default)

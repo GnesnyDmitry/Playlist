@@ -14,17 +14,17 @@ class TrackRepositoryImpl(
     private val dtoTrackMapper: DtoTrackMapper,
     private val localTrackStorage: LocalTrackStorage,
 ) : TrackRepository {
-    override fun searchTrack(expression: String): Flow<ResponseState> = flow {
+    override suspend fun searchTrack(expression: String): ResponseState {
 
         val response = networkClient.doRequest(TrackSearchRequest(expression))
 
-        emit(when(response.resultCode) {
+        return when(response.resultCode) {
             in 200..300 -> dtoTrackMapper.map(response as TrackResponse)
             in 400..500-> ResponseState.Error
             in 500..600 -> ResponseState.NoConnect
             -1 -> ResponseState.NoConnect
             else -> ResponseState.NoData()
-        })
+        }
     }
 
     override fun getTracksFromLocalStorage(key: String): MutableList<Track> {

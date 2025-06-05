@@ -7,7 +7,9 @@ import com.example.playlistmaker.media.domain.interactor.FavoriteTracksInteracto
 import com.example.playlistmaker.media.domain.interactor.FavoriteTracksInteractorIpml
 import com.example.playlistmaker.media.presentation.FavoriteTracksViewModel
 import com.example.playlistmaker.media.presentation.MediaViewModel
-import com.example.playlistmaker.media.presentation.PlaylistViewModel
+import com.example.playlistmaker.media.presentation.PlaylistsViewModel
+import com.example.playlistmaker.media.ui.FavoriteTracksUiStateMapper
+import com.example.playlistmaker.media.ui.PlaylistScreenUiStateMapper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -30,13 +32,15 @@ val mediaModule = module {
 
     viewModel {
         FavoriteTracksViewModel(
-            interactor = get()
+            interactor = get(),
+            favoriteTracksUiStateMapper = FavoriteTracksUiStateMapper()
         )
     }
 
     viewModel {
-        PlaylistViewModel(
-            playlistDbInteractor = get()
+        PlaylistsViewModel(
+            playlistDbInteractor = get(),
+            playlistScreenUiStateMapper = PlaylistScreenUiStateMapper()
         )
     }
 }

@@ -1,131 +1,128 @@
 package com.example.playlistmaker.search.presentation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.search.domain.ResponseState
 import com.example.playlistmaker.search.domain.ResponseState.Content
 import com.example.playlistmaker.search.domain.ResponseState.Error
 import com.example.playlistmaker.search.domain.ResponseState.NoConnect
 import com.example.playlistmaker.search.domain.ResponseState.NoData
 import com.example.playlistmaker.search.domain.api.TrackInteractor
-import com.example.playlistmaker.search.ui.model.ClearBtnState
+import com.example.playlistmaker.search.ui.SearchScreenUiStateMapper
 import com.example.playlistmaker.search.ui.model.SearchViewState
 import com.example.playlistmaker.tools.DELAY1000L
-import com.example.playlistmaker.tools.debounce
+import com.example.playlistmaker.tools.TRACK_KEY
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SearchViewModel(private val searchInteractor: TrackInteractor) : ViewModel() {
+class SearchViewModel(
+    private val searchInteractor: TrackInteractor,
+    val searchScreenUiStateMapper: SearchScreenUiStateMapper
+) : ViewModel() {
 
     private val trackListHistory = mutableListOf<Track>()
-    private var latestText: String = ""
 
-    private val tracksSearchLiveData = MutableLiveData<List<Track>>()
-    val tracksSearch: LiveData<List<Track>> = tracksSearchLiveData
-
-    private val searchViewState = MutableLiveData<SearchViewState>()
-
-    private var debounceSearchTracks = debounce(
-        delayMillis = DELAY1000L,
-        coroutineScope = viewModelScope,
-        deferredUsing = true,
-        action = ::searchIfNeed
+    private val queryFlow = MutableSharedFlow<String>(
+        replay = 1,
+        extraBufferCapacity = 0,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private fun searchIfNeed(text: String?) {
-        if (text != null) {
-            searchTracks(text)
+    private val searchViewState = MutableStateFlow<SearchViewState>(SearchViewState.Default)
+
+    @OptIn(FlowPreview::class)
+    val searchViewStateFlow: Flow<SearchViewState> = queryFlow
+        .debounce(DELAY1000L)
+        .distinctUntilChanged()
+        .map(::mapToSearchViewState)
+
+        .flowOn(Dispatchers.IO)
+
+    val resultFlow: Flow<SearchViewState> = merge(
+        searchViewState,
+        searchViewStateFlow
+    )
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = SearchViewState.Default
+        )
+
+    private suspend fun mapToSearchViewState(query: String): SearchViewState {
+        return if (query.isEmpty()) {
+            SearchViewState.HistoryContent(
+                searchInteractor.getTracksFromLocalStorage(HISTORY_KEY)
+            )
+        } else {
+            getViewState(searchInteractor.searchTracks(query))
         }
     }
 
-    fun searchViewStateLiveData(): LiveData<SearchViewState> = searchViewState
+    private fun getViewState(state: ResponseState): SearchViewState {
+        return when (state) {
+            is NoConnect -> SearchViewState.Error
+            is Error -> SearchViewState.Error
+            is NoData -> SearchViewState.NoData(state.data)
+            is Content -> SearchViewState.SearchContent(state.data)
+        }
+    }
 
     init {
         trackListHistory.addAll(searchInteractor.getTracksFromLocalStorage(HISTORY_KEY))
     }
 
-    fun updateTrackList(newTracks: List<Track>) {
-        tracksSearchLiveData.postValue(newTracks)
+    private fun openPlayerActivity(context: Context, track: Track) {
+        val intent = Intent(context, PlayerActivity::class.java)
+        intent.putExtra(TRACK_KEY, track)
+        context.startActivity(intent)
     }
 
-    fun onClickedTrack(track: Track) {
+
+    fun onClickedTrack(track: Track, context: Context) {
+        openPlayerActivity(context, track)
         viewModelScope.launch(Dispatchers.IO) {
             searchInteractor.saveTrackToLocalStorage(HISTORY_KEY, trackListHistory, track)
         }
     }
 
-    fun onClickEditText(query: String) {
-        if (query.isEmpty()) showHistoryContent()
-    }
-
-    fun onClickClearEditText() {
-        searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.DEFAULT)
-        latestText = ""
-        showHistoryContent()
-    }
-
     fun onClickedBtnClearHistory() {
-        searchViewState.postValue(SearchViewState.Default)
+        searchViewState.tryEmit(SearchViewState.Default)
         searchInteractor.clearTrackLocalStorage(HISTORY_KEY)
     }
 
     fun onTextChange(text: String) {
-        defineState(text)
-        if (text.length < 2) {
-            debounceSearchTracks(null)
-            showHistoryContent()
-        } else searchDebounce(text = text)
+            queryFlow.tryEmit(text)
     }
 
-    fun onClickedRefresh(text: String) {
-        searchViewState.value = SearchViewState.Loading
-        searchTracks(text)
-    }
-
-    private fun showHistoryContent() {
-        searchViewState.value = SearchViewState.Loading
-        viewModelScope.launch {
-            searchViewState.postValue(
-                SearchViewState.HistoryContent(
-                    searchInteractor.getTracksFromLocalStorage(HISTORY_KEY)
-                )
+    fun showHistoryContent() {
+        println("qqq showHistory")
+        searchViewState.tryEmit(SearchViewState.Loading)
+        searchViewState.tryEmit(
+            SearchViewState.HistoryContent(
+                searchInteractor.getTracksFromLocalStorage(HISTORY_KEY)
             )
-        }
+        )
     }
 
-    private fun searchDebounce(text: String) {
-        if (text != latestText) {
-            latestText = text
-            debounceSearchTracks(text)
-        }
-    }
-
-    private fun searchTracks(query: String) {
-
-        searchViewState.value = SearchViewState.Loading
-
-        viewModelScope.launch(Dispatchers.IO) {
-            searchInteractor.searchTracks(query).collect { responseState ->
-                when (responseState) {
-                    is NoConnect -> searchViewState.postValue(SearchViewState.Error)
-                    is Error -> searchViewState.postValue(SearchViewState.Error)
-                    is NoData -> searchViewState.postValue(SearchViewState.NoData(responseState.data))
-                    is Content -> searchViewState.postValue(
-                        SearchViewState.SearchContent(
-                            responseState.data
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun defineState(text: String) {
-        if (text.isNotEmpty()) {
-            searchViewState.value = SearchViewState.ClearBtn(ClearBtnState.TEXT)
-        }
+    fun hideHistory() {
+        println("qqq hideHistory")
+        searchViewState.tryEmit(SearchViewState.Default)
     }
 
     companion object {

@@ -40,6 +40,11 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.6"
     }
 }
 
@@ -53,6 +58,7 @@ dependencies {
     implementation(libs.gson)
     //Koin
     implementation(libs.koin)
+    implementation(libs.koin.compose)
     //Fragments
     implementation(libs.fragments)
     //ViewPager2
@@ -62,6 +68,14 @@ dependencies {
     //Room
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
+    //Compose
+    implementation(libs.compose)
+    implementation(libs.activity.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
+    debugImplementation(libs.compose.ui.tooling)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

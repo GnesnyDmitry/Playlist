@@ -9,5 +9,4 @@ sealed interface SearchViewState {
     class NoData(val data: List<Track>): SearchViewState
     data class HistoryContent(val list: List<Track>): SearchViewState
     object Error: SearchViewState
-    data class ClearBtn(val state: Enum<ClearBtnState>) : SearchViewState
 }
